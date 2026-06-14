@@ -23,7 +23,7 @@
           <input type="tel" id="phone" name="phone" required aria-required="true"
             aria-describedby="phone-help phone-error" aria-invalid="false" autocomplete="tel"
             placeholder="+7 123 456 78 90">
-          <div id="phone-help">Введите номер в формате +7XXXXXXXXXX или 8XXXXXXXXXX (10 цифр после кода)</div>
+          <div id="phone-help">Введите номер в формате +7XXXXXXXXXX</div>
           <div id="phone-error" class="error-message" role="alert" aria-live="polite"
             style="color: red; margin-top: 5px;"></div>
         </div>
@@ -106,7 +106,6 @@
         phoneError.textContent = message;
         phoneInput.setAttribute('aria-invalid', 'true');
         phoneInput.setAttribute('aria-errormessage', 'phone-error');
-        phoneInput.focus();
       }
 
       function clearCodeError() {
@@ -119,7 +118,6 @@
         codeError.textContent = message;
         codeInput.setAttribute('aria-invalid', 'true');
         codeInput.setAttribute('aria-errormessage', 'code-error');
-        codeInput.focus();
       }
 
       // Правильная валидация телефона: +7 или 8 в начале, затем 10 цифр
@@ -228,7 +226,6 @@
         stepPhone.hidden = true;
         stepCode.hidden = false;
         codeInput.value = '';
-        codeInput.focus();
 
         const formattedPhone = formatPhoneForDisplay(phoneNumber);
         announceForScreenReader(`Код отправлен на номер ${formattedPhone}. Введите код подтверждения. Кнопка повторной отправки кода будет доступна через 30 секунд.`);
@@ -248,7 +245,6 @@
           clearCodeError();
         }
 
-        phoneInput.focus();
       }
 
       function announceForScreenReader(message) {
@@ -341,7 +337,6 @@
           setCodeError(`Неверный код. Попробуйте ещё раз или нажмите "Отправить код повторно".`);
           announceForScreenReader('Неверный код подтверждения. Пожалуйста, попробуйте снова.');
           codeInput.value = '';
-          codeInput.focus();
         }
       });
 
@@ -357,7 +352,6 @@
           // Это информационное сообщение, показываем его в error-области на странице
           setCodeError(msg);
           announceForScreenReader(msg);
-          resendCodeBtn.focus();
           return;
         }
 
@@ -379,14 +373,12 @@
 
         const formattedPhone = formatPhoneForDisplay(currentPhoneNumber);
         announceForScreenReader(`Новый код отправлен на номер ${formattedPhone}`);
-        codeInput.focus();
       });
 
       // ========== Обработчик кнопки "Изменить номер" ==========
       backToPhoneBtn.addEventListener('click', function () {
         showPhoneStep(true);
         phoneInput.value = '';
-        phoneInput.focus();
       });
 
       // Очистка таймера при уходе со страницы
