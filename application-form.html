@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Анкета на получение кредита</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+      color: #1a1a1a;
+      background-color: #f5f5f5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background-color: #fff;
+      padding: 1.5rem;
+      text-align: center;
+      border-bottom: 1px solid #e0e0e0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #333;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .credit-form-container {
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      padding: 2rem;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: #333;
+      border-left: 4px solid #007aff;
+      padding-left: 0.75rem;
+    }
+
+    .form-section {
+      margin-bottom: 2rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 1rem;
+    }
+
+    .form-section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .form-row {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: #555;
+      font-size: 0.875rem;
+    }
+
+    .required-field::after {
+      content: " *";
+      color: #ff3b30;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      transition: border-color 0.2s;
+      font-family: inherit;
+      background-color: #fff;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #007aff;
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+    }
+
+    input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="true"] {
+      border-color: #ff3b30;
+    }
+
+    .error-message {
+      font-size: 0.75rem;
+      color: #ff3b30;
+      margin-top: 0.25rem;
+    }
+
+    .field-hint {
+      font-size: 0.75rem;
+      color: #666;
+      margin-top: 0.25rem;
+    }
+
+    .radio-group, .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .radio-option, .checkbox-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .radio-option input, .checkbox-option input {
+      width: auto;
+      margin: 0;
+    }
+
+    .radio-option label, .checkbox-option label {
+      margin-bottom: 0;
+      font-weight: normal;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background-color: #007aff;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      font-family: inherit;
+      flex: 1;
+      min-width: 120px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    button:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
+    }
+
+    #reset-btn {
+      background-color: #e0e0e0;
+      color: #333;
+    }
+
+    #reset-btn:hover {
+      background-color: #c7c7c7;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.75rem;
+      color: #666;
+      border-top: 1px solid #e0e0e0;
+      background-color: #fff;
+    }
+
+    #aria-announcer {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+
+    @media (max-width: 640px) {
+      main {
+        padding: 1rem;
+      }
+      .credit-form-container {
+        padding: 1.5rem;
+      }
+      .form-actions {
+        flex-direction: column;
+      }
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Анкета на получение кредита</h1>
+  </header>
+
+  <main>
+    <section class="credit-form-container">
+      <h2>Заполните заявку</h2>
+      <form id="credit-form" novalidate>
+        <!-- Личная информация -->
+        <section class="form-section">
+          <h3 style="font-size: 1rem; margin-bottom: 1rem; color: #444;">Личные данные</h3>
+          
+          <section class="form-row">
+            <label for="fullname" class="required-field">ФИО</label>
+            <input type="text" id="fullname" name="fullname" required aria-required="true"
+                   aria-describedby="fullname-error fullname-hint" autocomplete="name">
+            <section id="fullname-hint" class="field-hint">Введите полностью фамилию, имя и отчество</section>
+            <section id="fullname-error" class="error-message" aria-live="polite"></section>
+          </section>
+
+          <section class="form-row">
+            <label for="birthdate" class="required-field">Дата рождения</label>
+            <input type="date" id="birthdate" name="birthdate" required aria-required="true"
+                   aria-describedby="birthdate-error birthdate-hint">
+            <section id="birthdate-hint" class="field-hint">Например: 15.05.1990</section>
+            <section id="birthdate-error" class="error-message" aria-live="polite"></section>
+          </section>
+
+          <section class="form-row">
+            <label for="phone" class="required-field">Номер телефона</label>
+            <input type="tel" id="phone" name="phone" required aria-required="true"
+                   aria-describedby="phone-error phone-hint" autocomplete="tel" placeholder="+7 123 456-78-90">
+            <section id="phone-hint" class="field-hint">В формате +7XXXXXXXXXX или 8XXXXXXXXXX</section>
+            <section id="phone-error" class="error-message" aria-live="polite"></section>
+          </section>
+
+          <section class="form-row">
+            <label for="email">Email (необязательно)</label>
+            <input type="email" id="email" name="email" aria-describedby="email-error email-hint" autocomplete="email">
+            <section id="email-hint" class="field-hint">Для отправки одобрения</section>
+            <section id="email-error" class="error-message" aria-live="polite"></section>
+          </section>
+        </section>
+
+        <!-- Паспортные данные -->
+        <section class="form-section">
+          <h3 style="font-size: 1rem; margin-bottom: 1rem; color: #444;">Паспортные данные</h3>
+          
+          <section class="form-row">
+            <label for="passport-series" class="required-field">Серия и номер паспорта</label>
+            <input type="text" id="passport-series" name="passport" required aria-required="true"
+                   aria-describedby="passport-error passport-hint" placeholder="0000 000000">
+            <section id="passport-hint" class="field-hint">4 цифры серия, затем 6 цифр номер (через пробел)</section>
+            <section id="passport-error" class="error-message" aria-live="polite"></section>
+          </section>
+
+          <section class="form-row">
+            <label for="passport-issued" class="required-field">Кем выдан</label>
+            <input type="text" id="passport-issued" name="passportIssued" required aria-required="true"
+                   aria-describedby="issued-error">
+            <section id="issued-error" class="error-message" aria-live="polite"></section>
+          </section>
+
+          <section class="form-row">
+            <label for="passport-date" class="required-field">Дата выдачи</label>
+            <input type="date" id="passport-date" name="passportDate" required aria-required="true"
+                   aria-describedby="passportDate-error">
+            <section id="passportDate-error" class="error-message" aria-live="polite"></section>
+          </section>
+        </section>
+
+        <!-- Финансовая информация -->
+        <section class="form-section">
+          <h3 style="font-size: 1rem; margin-bottom: 1rem; color: #444;">Финансовые данные</h3>
+          
+          <section class="form-row">
+            <label for="employment" class="required-field">Тип занятости</label>
+            <select id="employment" name="employment" required aria-required="true" aria-describedby="employment-error">
+              <option value="">Выберите вариант</option>
+              <option value="employed">Наёмный работник</option>
+              <option value="self-employed">Самозанятый</option>
+              <option value="business">ИП / Собственник бизнеса</option>
+              <option value="unemployed">Безработный</option>
+            </select>
+            <section id="employment-error" class="error-message" aria-live="polite"></section>
+          </section>
+
+          <section class="form-row">
+            <label for="income" class="required-field">Ежемесячный доход (₽)</label>
+            <input type="number" id="income" name="income" required aria-required="true"
+                   aria-describedby="income-error income-hint" step="1000" min="0">
+            <section id="income-hint" class="field-hint">Укажите средний доход за последние 3 месяца</section>
+            <section id="income-error" class="error-message" aria-live="polite"></section>
+          </section>
+
+          <section class="form-row">
+            <label for="credit-amount" class="required-field">Желаемая сумма кредита (₽)</label>
+            <input type="number" id="credit-amount" name="creditAmount" required aria-required="true"
+                   aria-describedby="amount-error amount-hint" min="10000" step="10000">
+            <section id="amount-hint" class="field-hint">Минимальная сумма 10 000 ₽</section>
+            <section id="amount-error" class="error-message" aria-live="polite"></section>
+          </section>
+
+          <section class="form-row">
+            <label for="credit-term" class="required-field">Срок кредита (месяцев)</label>
+            <select id="credit-term" name="creditTerm" required aria-required="true" aria-describedby="term-error">
+              <option value="">Выберите срок</option>
+              <option value="6">6 месяцев</option>
+              <option value="12">12 месяцев</option>
+              <option value="24">24 месяца</option>
+              <option value="36">36 месяцев</option>
+              <option value="60">60 месяцев</option>
+            </select>
+            <section id="term-error" class="error-message" aria-live="polite"></section>
+          </section>
+        </section>
+
+        <!-- Дополнительная информация -->
+        <section class="form-section">
+          <h3 style="font-size: 1rem; margin-bottom: 1rem; color: #444;">Дополнительно</h3>
+          
+          <section class="form-row">
+            <span id="purpose-label" class="required-field">Цель кредита</span>
+            <section role="radiogroup" aria-labelledby="purpose-label" aria-describedby="purpose-error">
+              <section class="radio-group">
+                <section class="radio-option">
+                  <input type="radio" id="purpose-consumer" name="purpose" value="consumer" aria-required="true">
+                  <label for="purpose-consumer">Потребительский</label>
+                </section>
+                <section class="radio-option">
+                  <input type="radio" id="purpose-car" name="purpose" value="car">
+                  <label for="purpose-car">Покупка авто</label>
+                </section>
+                <section class="radio-option">
+                  <input type="radio" id="purpose-home" name="purpose" value="home">
+                  <label for="purpose-home">Ремонт / недвижимость</label>
+                </section>
+                <section class="radio-option">
+                  <input type="radio" id="purpose-other" name="purpose" value="other">
+                  <label for="purpose-other">Другое</label>
+                </section>
+              </section>
+            </section>
+            <section id="purpose-error" class="error-message" aria-live="polite"></section>
+          </section>
+
+          <section class="form-row">
+            <section class="checkbox-option">
+              <input type="checkbox" id="offer-agree" name="agree" required aria-required="true" aria-describedby="agree-error">
+              <label for="offer-agree" class="required-field">Я согласен на обработку персональных данных и принимаю условия кредитного договора</label>
+            </section>
+            <section id="agree-error" class="error-message" aria-live="polite"></section>
+          </section>
+
+          <section class="form-row">
+            <label for="comment">Комментарий (необязательно)</label>
+            <textarea id="comment" name="comment" rows="3" aria-describedby="comment-hint"></textarea>
+            <section id="comment-hint" class="field-hint">Дополнительная информация для банка</section>
+          </section>
+        </section>
+
+        <section class="form-actions">
+          <button type="submit" id="submit-btn" aria-label="Отправить заявку на кредит">Отправить заявку</button>
+          <button type="button" id="reset-btn" aria-label="Очистить форму">Очистить</button>
+        </section>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 Банк «Кредитный помощник» — предварительное рассмотрение за 5 минут</p>
+  </footer>
+
+  <section id="aria-announcer" aria-live="polite"></section>
+
+  <script>
+    (function() {
+      // DOM элементы
+      const form = document.getElementById('credit-form');
+      const fullnameInput = document.getElementById('fullname');
+      const birthdateInput = document.getElementById('birthdate');
+      const phoneInput = document.getElementById('phone');
+      const emailInput = document.getElementById('email');
+      const passportSeriesInput = document.getElementById('passport-series');
+      const passportIssuedInput = document.getElementById('passport-issued');
+      const passportDateInput = document.getElementById('passport-date');
+      const employmentSelect = document.getElementById('employment');
+      const incomeInput = document.getElementById('income');
+      const creditAmountInput = document.getElementById('credit-amount');
+      const creditTermSelect = document.getElementById('credit-term');
+      const purposeRadios = document.querySelectorAll('input[name="purpose"]');
+      const offerCheckbox = document.getElementById('offer-agree');
+      const resetBtn = document.getElementById('reset-btn');
+      const announcer = document.getElementById('aria-announcer');
+
+      // Элементы ошибок
+      const errorElements = {
+        fullname: document.getElementById('fullname-error'),
+        birthdate: document.getElementById('birthdate-error'),
+        phone: document.getElementById('phone-error'),
+        email: document.getElementById('email-error'),
+        passport: document.getElementById('passport-error'),
+        passportIssued: document.getElementById('issued-error'),
+        passportDate: document.getElementById('passportDate-error'),
+        employment: document.getElementById('employment-error'),
+        income: document.getElementById('income-error'),
+        creditAmount: document.getElementById('amount-error'),
+        creditTerm: document.getElementById('term-error'),
+        purpose: document.getElementById('purpose-error'),
+        agree: document.getElementById('agree-error')
+      };
+
+      // Вспомогательные функции для ARIA
+      function setError(input, errorElement, message) {
+        if (errorElement) errorElement.textContent = message;
+        if (input) {
+          input.setAttribute('aria-invalid', message ? 'true' : 'false');
+          if (message) {
+            input.setAttribute('aria-errormessage', errorElement?.id || '');
+          } else {
+            input.removeAttribute('aria-errormessage');
+          }
+        }
+      }
+
+      function clearError(input, errorElement) {
+        setError(input, errorElement, '');
+      }
+
+      function announce(message) {
+        if (announcer) {
+          announcer.textContent = message;
+          setTimeout(() => { if (announcer) announcer.textContent = ''; }, 3000);
+        }
+      }
+
+      // Валидация ФИО (не менее 3 слов или хотя бы 2 символа? простейшая проверка)
+      function validateFullname(value) {
+        const trimmed = value.trim();
+        if (!trimmed) return 'Укажите ваше ФИО';
+        if (trimmed.length < 5) return 'Введите полное ФИО (минимум 5 символов)';
+        const words = trimmed.split(/\s+/);
+        if (words.length < 2) return 'Введите фамилию и имя';
+        return '';
+      }
+
+      function validateBirthdate(value) {
+        if (!value) return 'Укажите дату рождения';
+        const birthDate = new Date(value);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+        if (age < 18) return 'Возраст должен быть не менее 18 лет';
+        if (age > 90) return 'Проверьте корректность даты рождения';
+        return '';
+      }
+
+      function validatePhone(value) {
+        const cleaned = value.replace(/[\s\-\(\)]/g, '');
+        const phoneRegex = /^(\+7|8)\d{10}$/;
+        if (!cleaned) return 'Введите номер телефона';
+        if (!phoneRegex.test(cleaned)) return 'Неверный формат. Используйте +7XXXXXXXXXX или 8XXXXXXXXXX';
+        return '';
+      }
+
+      function validateEmail(value) {
+        if (!value) return '';
+        const emailRegex = /^[^\s@]+@([^\s@]+\.)+[^\s@]+$/;
+        if (!emailRegex.test(value)) return 'Введите корректный email (например, name@domain.ru)';
+        return '';
+      }
+
+      function validatePassportSeries(value) {
+        const cleaned = value.replace(/\s/g, '');
+        if (!cleaned) return 'Введите серию и номер паспорта';
+        if (!/^\d{10}$/.test(cleaned)) return 'Паспорт: 10 цифр (серия 4 цифры + номер 6 цифр)';
+        return '';
+      }
+
+      function validatePassportIssued(value) {
+        if (!value.trim()) return 'Укажите, кем выдан паспорт';
+        return '';
+      }
+
+      function validatePassportDate(value) {
+        if (!value) return 'Укажите дату выдачи паспорта';
+        const issuedDate = new Date(value);
+        if (isNaN(issuedDate.getTime())) return 'Некорректная дата';
+        const today = new Date();
+        if (issuedDate > today) return 'Дата выдачи не может быть в будущем';
+        return '';
+      }
+
+      function validateEmployment(value) {
+        if (!value) return 'Выберите тип занятости';
+        return '';
+      }
+
+      function validateIncome(value) {
+        const num = Number(value);
+        if (!value) return 'Укажите ежемесячный доход';
+        if (isNaN(num) || num < 5000) return 'Доход должен быть не менее 5000 ₽';
+        return '';
+      }
+
+      function validateCreditAmount(value) {
+        const num = Number(value);
+        if (!value) return 'Укажите желаемую сумму';
+        if (isNaN(num) || num < 10000) return 'Сумма не может быть менее 10 000 ₽';
+        if (num > 5000000) return 'Максимальная сумма 5 000 000 ₽';
+        return '';
+      }
+
+      function validateCreditTerm(value) {
+        if (!value) return 'Выберите срок кредита';
+        return '';
+      }
+
+      function validatePurpose() {
+        let selected = false;
+        for (let radio of purposeRadios) {
+          if (radio.checked) {
+            selected = true;
+            break;
+          }
+        }
+        return selected ? '' : 'Выберите цель кредита';
+      }
+
+      function validateAgree() {
+        return offerCheckbox.checked ? '' : 'Необходимо согласие на обработку данных';
+      }
+
+      // Общая валидация всей формы
+      function validateForm() {
+        let isValid = true;
+
+        const fullnameErr = validateFullname(fullnameInput.value);
+        setError(fullnameInput, errorElements.fullname, fullnameErr);
+        if (fullnameErr) isValid = false;
+
+        const birthErr = validateBirthdate(birthdateInput.value);
+        setError(birthdateInput, errorElements.birthdate, birthErr);
+        if (birthErr) isValid = false;
+
+        const phoneErr = validatePhone(phoneInput.value);
+        setError(phoneInput, errorElements.phone, phoneErr);
+        if (phoneErr) isValid = false;
+
+        const emailErr = validateEmail(emailInput.value);
+        setError(emailInput, errorElements.email, emailErr);
+        if (emailErr) isValid = false;
+
+        const passportErr = validatePassportSeries(passportSeriesInput.value);
+        setError(passportSeriesInput, errorElements.passport, passportErr);
+        if (passportErr) isValid = false;
+
+        const issuedErr = validatePassportIssued(passportIssuedInput.value);
+        setError(passportIssuedInput, errorElements.passportIssued, issuedErr);
+        if (issuedErr) isValid = false;
+
+        const passportDateErr = validatePassportDate(passportDateInput.value);
+        setError(passportDateInput, errorElements.passportDate, passportDateErr);
+        if (passportDateErr) isValid = false;
+
+        const employmentErr = validateEmployment(employmentSelect.value);
+        setError(employmentSelect, errorElements.employment, employmentErr);
+        if (employmentErr) isValid = false;
+
+        const incomeErr = validateIncome(incomeInput.value);
+        setError(incomeInput, errorElements.income, incomeErr);
+        if (incomeErr) isValid = false;
+
+        const amountErr = validateCreditAmount(creditAmountInput.value);
+        setError(creditAmountInput, errorElements.creditAmount, amountErr);
+        if (amountErr) isValid = false;
+
+        const termErr = validateCreditTerm(creditTermSelect.value);
+        setError(creditTermSelect, errorElements.creditTerm, termErr);
+        if (termErr) isValid = false;
+
+        const purposeErr = validatePurpose();
+        setError(null, errorElements.purpose, purposeErr);
+        if (purposeErr) isValid = false;
+
+        const agreeErr = validateAgree();
+        setError(offerCheckbox, errorElements.agree, agreeErr);
+        if (agreeErr) isValid = false;
+
+        return isValid;
+      }
+
+      // Обработка сабмита
+      form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        const isValid = validateForm();
+        
+        if (isValid) {
+          // Собираем данные для мока
+          const selectedPurpose = Array.from(purposeRadios).find(r => r.checked)?.value || '';
+          const formData = {
+            fullname: fullnameInput.value.trim(),
+            birthdate: birthdateInput.value,
+            phone: phoneInput.value.trim(),
+            email: emailInput.value.trim(),
+            passport: passportSeriesInput.value.trim(),
+            passportIssued: passportIssuedInput.value.trim(),
+            passportDate: passportDateInput.value,
+            employment: employmentSelect.options[employmentSelect.selectedIndex]?.text,
+            income: incomeInput.value,
+            creditAmount: creditAmountInput.value,
+            creditTerm: creditTermSelect.options[creditTermSelect.selectedIndex]?.text,
+            purpose: selectedPurpose,
+            comment: document.getElementById('comment').value.trim()
+          };
+          
+          // Мок отправки - показываем alert с подтверждением
+          alert(`✅ Заявка на кредит успешно отправлена!\n\n${formData.fullname}, сумма ${Number(formData.creditAmount).toLocaleString()} ₽.\nСрок рассмотрения до 5 минут.`);
+          announce('Заявка отправлена. Спасибо за обращение!');
+          
+          // По желанию можно сбросить форму после успешной отправки?
+          // Но согласно доступности, не сбрасываем, но можно предложить очистку вручную. Оставим.
+          // Для демонстрации можно очистить, но это не требуется по заданию, однако многие хотят. 
+          // Лучше не очищать, чтобы пользователь видел данные, но добавим кнопку Очистить.
+        } else {
+          announce('Пожалуйста, исправьте ошибки в форме');
+          // Фокусируемся на первом поле с ошибкой
+          const firstInvalid = document.querySelector('[aria-invalid="true"]');
+          if (firstInvalid) firstInvalid.focus();
+        }
+      });
+
+      // Функция очистки формы
+      function resetForm() {
+        form.reset();
+        // Очищаем все ошибки
+        const allInputs = [fullnameInput, birthdateInput, phoneInput, emailInput, passportSeriesInput, passportIssuedInput, passportDateInput, employmentSelect, incomeInput, creditAmountInput, creditTermSelect, offerCheckbox];
+        allInputs.forEach(input => {
+          if (input) {
+            input.removeAttribute('aria-invalid');
+            input.removeAttribute('aria-errormessage');
+          }
+        });
+        // Очищаем радио-группу
+        purposeRadios.forEach(r => r.checked = false);
+        
+        // Сброс текста ошибок
+        for (let key in errorElements) {
+          if (errorElements[key]) errorElements[key].textContent = '';
+        }
+        announce('Форма очищена');
+      }
+
+      resetBtn.addEventListener('click', resetForm);
+
+      // Очистка ошибок при вводе для каждого поля (live validation)
+      fullnameInput.addEventListener('input', () => setError(fullnameInput, errorElements.fullname, validateFullname(fullnameInput.value)));
+      birthdateInput.addEventListener('change', () => setError(birthdateInput, errorElements.birthdate, validateBirthdate(birthdateInput.value)));
+      phoneInput.addEventListener('input', () => setError(phoneInput, errorElements.phone, validatePhone(phoneInput.value)));
+      emailInput.addEventListener('input', () => setError(emailInput, errorElements.email, validateEmail(emailInput.value)));
+      passportSeriesInput.addEventListener('input', () => setError(passportSeriesInput, errorElements.passport, validatePassportSeries(passportSeriesInput.value)));
+      passportIssuedInput.addEventListener('input', () => setError(passportIssuedInput, errorElements.passportIssued, validatePassportIssued(passportIssuedInput.value)));
+      passportDateInput.addEventListener('change', () => setError(passportDateInput, errorElements.passportDate, validatePassportDate(passportDateInput.value)));
+      employmentSelect.addEventListener('change', () => setError(employmentSelect, errorElements.employment, validateEmployment(employmentSelect.value)));
+      incomeInput.addEventListener('input', () => setError(incomeInput, errorElements.income, validateIncome(incomeInput.value)));
+      creditAmountInput.addEventListener('input', () => setError(creditAmountInput, errorElements.creditAmount, validateCreditAmount(creditAmountInput.value)));
+      creditTermSelect.addEventListener('change', () => setError(creditTermSelect, errorElements.creditTerm, validateCreditTerm(creditTermSelect.value)));
+      
+      // Для группы radio и checkbox используем специальный обработчик
+      function updatePurposeError() {
+        const err = validatePurpose();
+        setError(null, errorElements.purpose, err);
+      }
+      purposeRadios.forEach(radio => radio.addEventListener('change', updatePurposeError));
+      
+      offerCheckbox.addEventListener('change', () => {
+        const err = validateAgree();
+        setError(offerCheckbox, errorElements.agree, err);
+      });
+      
+      // Для комментария ошибок нет, но поддержка ARIA
+      document.getElementById('comment').addEventListener('input', function() {});
+    })();
+  </script>
+</body>
+</html>

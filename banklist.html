@@ -4,121 +4,507 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Кредитный навигатор — Список предложений</title>
-</head>
-<body>
-    <h1>Предложения: </h1>
-    <p id="loading-message">Загрузка предложений...</p>
-    <div id="banks-container"></div>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <script>
-        async function loadBanks() {
-            const container = document.getElementById('banks-container');
-            const loadingMsg = document.getElementById('loading-message');
-            
-            try {
-                const response = await fetch('banks.json');
-                if (!response.ok) {
-                    throw new Error(`Ошибка загрузки: ${response.status} ${response.statusText}`);
-                }
-                
-                const banks = await response.json();
-                
-                loadingMsg.style.display = 'none';
-                
-                if (!Array.isArray(banks)) {
-                    throw new Error('Некорректный формат данных: ожидается массив');
-                }
-                
-                if (banks.length === 0) {
-                    container.innerHTML = '<p>К сожалению, предложений пока нет.</p>';
-                    return;
-                }
-                
-                banks.forEach(bank => {
-                    const bankCard = document.createElement('div');
-                    bankCard.style.border = '1px solid #ccc';
-                    bankCard.style.margin = '12px 0';
-                    bankCard.style.padding = '15px';
-                    bankCard.style.borderRadius = '8px';
-                    bankCard.role = 'region';
-                    bankCard.tabIndex = 0;
-                    bankCard.ariaLabel = `${bank.name || 'неизвестного'}. Ставка: ${bank.interestRate !== undefined ? bank.interestRate + '%' : 'не указана'}.`;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.5;
+            color: #1a1a1a;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
-                    // Верхняя строка: эмодзи + название банка
-                    const headerElement = document.createElement('div');
-                    headerElement.style.display = 'flex';
-                    headerElement.style.alignItems = 'center';
-                    headerElement.style.gap = '10px';
-                    headerElement.style.marginBottom = '10px';
-                    
-                    const emojiSpan = document.createElement('span');
-                    emojiSpan.style.fontSize = '32px';
-                    emojiSpan.textContent = bank.emoji || '🏦';
-                    
-                    const nameElement = document.createElement('h3');
-                    nameElement.style.margin = '0';
-                    nameElement.textContent = bank.name || 'Название не указано';
-                    
-                    headerElement.appendChild(emojiSpan);
-                    headerElement.appendChild(nameElement);
-                    
-                    const rateElement = document.createElement('p');
-                    const rate = bank.interestRate !== undefined ? bank.interestRate : '—';
-                    rateElement.style.fontSize = '20px';
-                    rateElement.style.fontWeight = 'bold';
-                    rateElement.style.margin = '10px 0';
-                    rateElement.style.color = '#2c7a2c';
-                    rateElement.innerHTML = `Ставка: ${rate}%`;
-                    
-                    const featuresTitle = document.createElement('p');
-                    featuresTitle.style.margin = '10px 0 5px 0';
-                    featuresTitle.style.fontWeight = 'bold';
-                    featuresTitle.innerHTML = '✨ Преимущества:';
-                    
-                    const featuresList = document.createElement('ul');
-                    featuresList.style.margin = '0 0 15px 0';
-                    featuresList.style.paddingLeft = '20px';
-                    
-                    if (bank.features && Array.isArray(bank.features) && bank.features.length > 0) {
-                        bank.features.forEach(feature => {
-                            const li = document.createElement('li');
-                            li.style.margin = '5px 0';
-                            li.textContent = feature;
-                            featuresList.appendChild(li);
-                        });
-                    } else {
-                        const li = document.createElement('li');
-                        li.textContent = 'Нет информации';
-                        featuresList.appendChild(li);
-                    }
-                    
-                    const selectButton = document.createElement('button');
-                    selectButton.textContent = 'Выбрать';
-                    selectButton.ariaLabel = `Выбрать ${bank.name}`;
-                    selectButton.style.padding = '8px 16px';
-                    selectButton.style.fontSize = '14px';
-                    selectButton.style.cursor = 'pointer';
-                    selectButton.onclick = () => {
-                        alert(`Вы выбрали банк "${bank.name}" со ставкой ${bank.interestRate}%`);
-                    };
-                    
-                    bankCard.appendChild(headerElement);
-                    bankCard.appendChild(rateElement);
-                    bankCard.appendChild(featuresTitle);
-                    bankCard.appendChild(featuresList);
-                    bankCard.appendChild(selectButton);
-                    
-                    container.appendChild(bankCard);
-                });
-                
-            } catch (error) {
-                console.error('Ошибка:', error);
-                loadingMsg.textContent = `Не удалось загрузить список банков: ${error.message}`;
-                loadingMsg.style.color = 'red';
+        header {
+            background-color: #fff;
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+
+        .subheader {
+            font-size: 0.875rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        main {
+            flex: 1;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .loading-container, .error-container, .empty-container {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e0e0e0;
+            border-top-color: #007aff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .banks-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .bank-card {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 1.5rem;
+            transition: box-shadow 0.2s, transform 0.1s;
+            border: 1px solid #e0e0e0;
+        }
+
+        .bank-card:focus-visible {
+            outline: 3px solid #007aff;
+            outline-offset: 2px;
+            border-radius: 12px;
+        }
+
+        .bank-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .bank-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .bank-emoji {
+            font-size: 2.5rem;
+            line-height: 1;
+            background-color: #f8f8f8;
+            width: 54px;
+            height: 54px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+        }
+
+        .bank-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0;
+        }
+
+        .interest-rate {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #2c7a2c;
+            margin: 0.75rem 0;
+            padding: 0.5rem 0;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+        }
+
+        .features-title {
+            font-weight: 600;
+            margin: 1rem 0 0.5rem 0;
+            color: #444;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .features-list {
+            margin: 0 0 1.25rem 0;
+            padding-left: 1.25rem;
+            list-style-type: disc;
+        }
+
+        .features-list li {
+            margin: 0.5rem 0;
+            color: #444;
+        }
+
+        .select-button {
+            background-color: #007aff;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-family: inherit;
+            width: 100%;
+        }
+
+        .select-button:hover {
+            background-color: #0056b3;
+        }
+
+        .select-button:active {
+            transform: scale(0.98);
+        }
+
+        .select-button:focus-visible {
+            outline: 3px solid #007aff;
+            outline-offset: 2px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.75rem;
+            color: #666;
+            border-top: 1px solid #e0e0e0;
+            background-color: #fff;
+            margin-top: 2rem;
+        }
+
+        .error-message {
+            color: #ff3b30;
+        }
+
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
+        #aria-announcer {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
+        @media (max-width: 640px) {
+            main {
+                padding: 1rem;
+            }
+            .bank-card {
+                padding: 1.25rem;
+            }
+            .bank-emoji {
+                font-size: 2rem;
+                width: 48px;
+                height: 48px;
+            }
+            .interest-rate {
+                font-size: 1.5rem;
             }
         }
-        
-        window.addEventListener('DOMContentLoaded', loadBanks);
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Кредитный навигатор</h1>
+        <div class="subheader">Сравните предложения банков и выберите лучшее</div>
+    </header>
+
+    <main>
+        <div id="banks-container" class="banks-grid" role="region" aria-label="Список банковских предложений"></div>
+        <div id="loading-message" role="status" aria-live="polite"></div>
+    </main>
+
+    <footer>
+        <p>© 2026 Кредитный навигатор — Актуальные предложения банков</p>
+    </footer>
+
+    <div id="aria-announcer" aria-live="polite"></div>
+
+    <script>
+        (function() {
+            const container = document.getElementById('banks-container');
+            const loadingMsgDiv = document.getElementById('loading-message');
+            const announcer = document.getElementById('aria-announcer');
+
+            function announce(message) {
+                if (announcer) {
+                    announcer.textContent = message;
+                    setTimeout(() => {
+                        if (announcer) announcer.textContent = '';
+                    }, 3000);
+                }
+            }
+
+            function showLoading() {
+                container.innerHTML = '';
+                loadingMsgDiv.innerHTML = `
+                    <div class="loading-container" role="alert" aria-busy="true">
+                        <div class="loading-spinner" aria-hidden="true"></div>
+                        <p>Загрузка предложений банков...</p>
+                    </div>
+                `;
+                loadingMsgDiv.style.display = 'block';
+                announce('Загрузка списка предложений');
+            }
+
+            function showError(message) {
+                container.innerHTML = '';
+                loadingMsgDiv.innerHTML = `
+                    <div class="error-container" role="alert">
+                        <p style="color: #ff3b30; margin-bottom: 0.5rem;">⚠️ ${message}</p>
+                        <button id="retry-btn" class="select-button" style="width: auto; padding: 0.5rem 1.5rem; background-color: #007aff; margin-top: 0.75rem;">Повторить попытку</button>
+                    </div>
+                `;
+                loadingMsgDiv.style.display = 'block';
+                announce(`Ошибка: ${message}`);
+
+                const retryBtn = document.getElementById('retry-btn');
+                if (retryBtn) {
+                    retryBtn.addEventListener('click', () => {
+                        loadBanks();
+                    });
+                }
+            }
+
+            function showEmpty() {
+                container.innerHTML = '';
+                loadingMsgDiv.innerHTML = `
+                    <div class="empty-container" role="status">
+                        <p>📭 К сожалению, предложений пока нет.</p>
+                        <p style="font-size: 0.875rem; color: #666; margin-top: 0.5rem;">Проверьте позже — список обновляется регулярно.</p>
+                    </div>
+                `;
+                loadingMsgDiv.style.display = 'block';
+                announce('Предложения банков отсутствуют');
+            }
+
+            function formatPercent(value) {
+                if (value === undefined || value === null) return '—';
+                return String(value).replace('.', ',');
+            }
+
+            function createBankCard(bank, index) {
+                const bankCard = document.createElement('article');
+                bankCard.className = 'bank-card';
+                bankCard.setAttribute('aria-labelledby', `bank-name-${index}`);
+                bankCard.tabIndex = 0;
+                bankCard.setAttribute('role', 'article');
+
+                // Заголовок с эмодзи
+                const header = document.createElement('div');
+                header.className = 'bank-header';
+
+                const emojiSpan = document.createElement('span');
+                emojiSpan.className = 'bank-emoji';
+                emojiSpan.setAttribute('aria-hidden', 'true');
+                emojiSpan.textContent = bank.emoji || '🏦';
+
+                const nameHeading = document.createElement('h2');
+                nameHeading.id = `bank-name-${index}`;
+                nameHeading.className = 'bank-name';
+                nameHeading.textContent = bank.name || 'Название не указано';
+
+                header.appendChild(emojiSpan);
+                header.appendChild(nameHeading);
+
+                // Ставка
+                const rateValue = bank.interestRate !== undefined && bank.interestRate !== null ? bank.interestRate : null;
+                const rateText = rateValue !== null ? `${formatPercent(rateValue)}%` : 'не указана';
+                const rateElement = document.createElement('div');
+                rateElement.className = 'interest-rate';
+                rateElement.innerHTML = `Ставка: <strong>${rateText}</strong>`;
+                rateElement.setAttribute('aria-label', `Процентная ставка: ${rateText}`);
+
+                // Преимущества
+                const featuresTitle = document.createElement('div');
+                featuresTitle.className = 'features-title';
+                featuresTitle.innerHTML = '✨ Преимущества';
+                featuresTitle.setAttribute('aria-hidden', 'true');
+
+                const featuresList = document.createElement('ul');
+                featuresList.className = 'features-list';
+
+                let hasFeatures = false;
+                if (bank.features && Array.isArray(bank.features) && bank.features.length > 0) {
+                    hasFeatures = true;
+                    bank.features.forEach(feature => {
+                        const li = document.createElement('li');
+                        li.textContent = feature;
+                        featuresList.appendChild(li);
+                    });
+                } else {
+                    const li = document.createElement('li');
+                    li.textContent = 'Нет дополнительной информации';
+                    featuresList.appendChild(li);
+                }
+
+                // Скрытый текст для скринридеров (перечисление преимуществ)
+                const srFeatures = document.createElement('span');
+                srFeatures.className = 'visually-hidden';
+                if (hasFeatures) {
+                    const featuresText = bank.features.join('. ');
+                    srFeatures.textContent = `Преимущества: ${featuresText}`;
+                } else {
+                    srFeatures.textContent = 'Преимущества не указаны';
+                }
+
+                // Кнопка выбора
+                const selectButton = document.createElement('button');
+                selectButton.textContent = 'Выбрать предложение';
+                selectButton.className = 'select-button';
+                const bankNameForAria = bank.name || 'банк';
+                selectButton.setAttribute('aria-label', `Выбрать ${bankNameForAria} со ставкой ${rateText}`);
+                
+                selectButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const rateMsg = rateValue !== null ? `${rateValue}%` : 'не указана';
+                    alert(`✅ Вы выбрали банк "${bank.name || 'Без названия'}" со ставкой ${rateMsg}`);
+                    announce(`Выбран банк ${bank.name || 'без названия'}, ставка ${rateMsg}`);
+                });
+
+                // Сборка карточки
+                bankCard.appendChild(header);
+                bankCard.appendChild(rateElement);
+                bankCard.appendChild(featuresTitle);
+                bankCard.appendChild(featuresList);
+                bankCard.appendChild(srFeatures);
+                bankCard.appendChild(selectButton);
+
+                // Обработка Enter на карточке (для доступности)
+                bankCard.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        selectButton.click();
+                    }
+                });
+
+                return bankCard;
+            }
+
+            async function loadBanks() {
+                // Показываем загрузку
+                showLoading();
+                
+                try {
+                    // Используем правильный путь к banks.json (относительно корня)
+                    // Для локальной разработки – предположим, что файл лежит рядом с HTML
+                    const response = await fetch('banks.json');
+                    
+                    if (!response.ok) {
+                        // Пробуем получить текст ошибки
+                        let errorText = '';
+                        try {
+                            errorText = await response.text();
+                        } catch(e) { /* ignore */ }
+                        throw new Error(`Ошибка загрузки: ${response.status} ${response.statusText}`);
+                    }
+                    
+                    const banks = await response.json();
+                    
+                    // Валидация данных
+                    if (!banks) {
+                        throw new Error('Некорректный формат данных: отсутствуют данные');
+                    }
+                    
+                    // Если пришёл объект, но внутри массив — поддержим
+                    let banksArray = banks;
+                    if (!Array.isArray(banks) && banks.data && Array.isArray(banks.data)) {
+                        banksArray = banks.data;
+                    }
+                    
+                    if (!Array.isArray(banksArray)) {
+                        throw new Error('Некорректный формат данных: ожидается массив предложений');
+                    }
+                    
+                    // Убираем индикатор загрузки
+                    loadingMsgDiv.style.display = 'none';
+                    container.innerHTML = '';
+                    
+                    if (banksArray.length === 0) {
+                        showEmpty();
+                        return;
+                    }
+                    
+                    // Отрисовыем карточки
+                    banksArray.forEach((bank, idx) => {
+                        // Защита от некорректных объектов
+                        if (!bank || typeof bank !== 'object') return;
+                        const card = createBankCard(bank, idx);
+                        container.appendChild(card);
+                    });
+                    
+                    // Если после фильтрации карточек не осталось
+                    if (container.children.length === 0) {
+                        showEmpty();
+                        return;
+                    }
+                    
+                    announce(`Загружено ${container.children.length} банковских предложений`);
+                    
+                } catch (error) {
+                    console.error('Критическая ошибка:', error);
+                    let userMessage = 'Не удалось загрузить список банков. ';
+                    if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                        userMessage += 'Проверьте подключение к интернету или наличие файла banks.json.';
+                    } else if (error.message.includes('404')) {
+                        userMessage += 'Файл banks.json не найден. Убедитесь, что он находится в той же папке, что и страница.';
+                    } else {
+                        userMessage += error.message;
+                    }
+                    showError(userMessage);
+                }
+            }
+            
+            // Запускаем загрузку после полной загрузки DOM
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', loadBanks);
+            } else {
+                loadBanks();
+            }
+            
+            // Доступность: добавляем обработку клавиш на всю страницу (для навигации)
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    const focused = document.activeElement;
+                    if (focused && focused.classList && focused.classList.contains('bank-card')) {
+                        focused.blur();
+                    }
+                }
+            });
+        })();
     </script>
 </body>
 </html>

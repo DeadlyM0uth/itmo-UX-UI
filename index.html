@@ -6,6 +6,173 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Авторизация по номеру телефона</title>
 </head>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  color: #1a1a1a;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background-color: #fff;
+  padding: 1.5rem;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+section {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 2rem;
+  width: 100%;
+  max-width: 450px;
+}
+
+h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+form div {
+  margin-bottom: 1.25rem;
+}
+
+label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #555;
+  font-size: 0.875rem;
+}
+
+input {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+
+input:focus {
+  outline: none;
+  border-color: #007aff;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+input[aria-invalid="true"] {
+  border-color: #ff3b30;
+}
+
+button {
+  background-color: #007aff;
+  color: white;
+  border: none;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-family: inherit;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
+}
+
+#resend-code-btn,
+#back-to-phone-btn {
+  background-color: #e0e0e0;
+  color: #333;
+  margin-top: 0.5rem;
+}
+
+#resend-code-btn:hover,
+#back-to-phone-btn:hover {
+  background-color: #c7c7c7;
+}
+
+#send-code-btn {
+  width: 100%;
+}
+
+#step-code div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+#phone-help,
+#code-help {
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.error-message {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+footer {
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.75rem;
+  color: #666;
+  border-top: 1px solid #e0e0e0;
+  background-color: #fff;
+}
+
+#aria-announcer {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+</style>
 
 <body>
   <header>
@@ -21,11 +188,10 @@
         <div>
           <label for="phone">Номер телефона</label>
           <input type="tel" id="phone" name="phone" required aria-required="true"
-            aria-describedby="phone-help phone-error" aria-invalid="false" autocomplete="tel"
-            placeholder="+7 123 456 78 90">
-          <div id="phone-help">Введите номер в формате +7XXXXXXXXXX</div>
-          <div id="phone-error" class="error-message" role="alert" aria-live="polite"
-            style="color: red; margin-top: 5px;"></div>
+            aria-describedby="phone-help phone-error" aria-invalid="false" autocomplete="tel">
+          <section id="phone-help">Введите номер телефона</section>
+          <section id="phone-error" class="error-message" aria-live="polite" style="color: red; margin-top: 5px;">
+            </section>
         </div>
 
         <button type="submit" id="send-code-btn" aria-label="Отправить код подтверждения">
@@ -43,9 +209,9 @@
           <label for="code">Код подтверждения</label>
           <input type="text" id="code" name="code" required aria-required="true" aria-describedby="code-help code-error"
             aria-invalid="false" autocomplete="off" inputmode="numeric" pattern="[0-9]{6}" placeholder="123456">
-          <div id="code-help">Введите 6-значный код из SMS</div>
-          <div id="code-error" class="error-message" role="alert" aria-live="polite"
-            style="color: red; margin-top: 5px;"></div>
+          <section id="code-help">Введите 6-значный код из SMS</section>
+          <section id="code-error" class="error-message" aria-live="polite" style="color: red; margin-top: 5px;">
+          </section>
         </div>
 
         <div>
@@ -55,20 +221,19 @@
           <button type="button" id="resend-code-btn" aria-label="Отправить код повторно">
             Отправить код повторно (<span id="countdown-timer">30</span> сек)
           </button>
+          <button type="button" id="back-to-phone-btn" aria-label="Изменить номер телефона">
+            Изменить номер
+          </button>
         </div>
-
-        <button type="button" id="back-to-phone-btn" aria-label="Изменить номер телефона">
-          Изменить номер
-        </button>
       </form>
     </section>
   </main>
 
   <footer>
-    <p>© 2025 Все права защищены</p>
+    <p>© 2026 Все права защищены</p>
   </footer>
 
-  <div id="aria-announcer">Слова</div>
+  <section id="aria-announcer" aria-live="polite"></section>
 
   <script>
     (function () {
@@ -120,7 +285,7 @@
         codeInput.setAttribute('aria-errormessage', 'code-error');
       }
 
-      // Правильная валидация телефона: +7 или 8 в начале, затем 10 цифр
+      // Валидация телефона: +7 или 8 в начале, затем 10 цифр
       function validatePhone(phoneNumber) {
         // Удаляем все пробелы, дефисы, скобки и другие разделители
         const cleaned = phoneNumber.replace(/[\s\-\(\)]/g, '');
@@ -162,7 +327,7 @@
         return Math.floor(100000 + Math.random() * 900000).toString();
       }
 
-      // Функция отправки кода (мок) - ТОЛЬКО ЗДЕСЬ ALERT
+      // Функция отправки кода
       function sendMockCode(phoneNumber) {
         const code = generateCode();
         lastSentCode = code;
@@ -170,19 +335,19 @@
 
         const formattedPhone = formatPhoneForDisplay(phoneNumber);
         // Мок-сообщение в alert (единственное место с alert)
-        alert(`код — ${code})`);
+        alert(`код: ${code}`);
 
         // Для отладки в консоль
         console.log(`[MOCK] Код для ${phoneNumber}: ${code}`);
       }
 
-      // Запуск таймера на 30 секунд
+      // Запуск таймера на 60 секунд
       function startCountdown() {
         if (countdownInterval) {
           clearInterval(countdownInterval);
         }
 
-        remainingSeconds = 30;
+        remainingSeconds = 60;
         canResend = false;
         updateCountdownDisplay();
 
@@ -194,7 +359,7 @@
             countdownSpan.textContent = '0';
 
             // Анонсируем для скринридера
-            announceForScreenReader('Код можно отправить повторно. Кнопка отправки кода теперь активна.');
+            announceForScreenReader('Код можно отправить повторно.');
           } else {
             remainingSeconds--;
             updateCountdownDisplay();
@@ -251,17 +416,10 @@
         const announcer = document.getElementById('aria-announcer');
         if (announcer) {
           announcer.textContent = message;
-          setTimeout(() => {
-            if (announcer.textContent === message) {
-              announcer.textContent = '';
-            }
-          }, 5000);
         }
       }
 
       function createAnnouncer() {
-        announcer.setAttribute('aria-live', 'polite');
-        announcer.setAttribute('aria-atomic', 'true');
         announcer.style.position = 'absolute';
         announcer.style.width = '1px';
         announcer.style.height = '1px';
@@ -289,7 +447,7 @@
         const validation = validatePhone(phoneNumber);
 
         if (!validation.valid) {
-          setPhoneError('Неверный формат номера. Используйте +7XXXXXXXXXX');
+          setPhoneError('Неверный формат номера. Используйте российский формат.');
           return;
         }
 
@@ -335,10 +493,8 @@
         } else {
           // Неправильный код — показываем ошибку на странице, не скрывая шаг с кодом
           setCodeError(`Неверный код. Попробуйте ещё раз или нажмите "Отправить код повторно".`);
-          announceForScreenReader('Неверный код подтверждения. Пожалуйста, попробуйте снова.');
-          codeInput.value = '';
         }
-      });
+        });
 
       // Очистка ошибки при вводе кода
       codeInput.addEventListener('input', function () {
