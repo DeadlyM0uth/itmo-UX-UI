@@ -1,370 +1,401 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Авторизация по номеру телефона</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Авторизация по номеру телефона</title>
 </head>
+
 <body>
-    <header>
-        <h1>Вход в систему</h1>
-    </header>
+  <header>
+    <h1>Вход в систему</h1>
+  </header>
 
-    <main>
-        <!-- Шаг 1: ввод номера телефона -->
-        <section id="step-phone" aria-labelledby="phone-heading">
-            <h2 id="phone-heading">Вход по номеру телефона</h2>
-            
-            <form id="phone-form" method="post" novalidate>
-                <div>
-                    <label for="phone">Номер телефона</label>
-                    <input type="tel" 
-                           id="phone" 
-                           name="phone" 
-                           required
-                           aria-required="true"
-                           aria-describedby="phone-help"
-                           autocomplete="tel"
-                           placeholder="+7 (XXX) XXX-XX-XX">
-                    <div id="phone-help">Введите номер в международном формате</div>
-                </div>
-                
-                <button type="submit" id="send-code-btn" aria-label="Отправить код подтверждения">
-                    Получить код
-                </button>
-            </form>
-        </section>
+  <main>
+    <!-- Шаг 1: ввод номера телефона -->
+    <section id="step-phone" aria-labelledby="phone-heading">
+      <h2 id="phone-heading">Вход по номеру телефона</h2>
 
-        <!-- Шаг 2: ввод кода (изначально скрыт) -->
-        <section id="step-code" aria-labelledby="code-heading" hidden>
-            <h2 id="code-heading">Подтверждение кода</h2>
-            
-            <form id="code-form" method="post" novalidate>
-                <div>
-                    <label for="code">Код подтверждения</label>
-                    <input type="text" 
-                           id="code" 
-                           name="code" 
-                           required
-                           aria-required="true"
-                           aria-describedby="code-help"
-                           autocomplete="off"
-                           inputmode="numeric"
-                           pattern="[0-9]{6}"
-                           placeholder="123456">
-                    <div id="code-help">Введите 6-значный код из SMS</div>
-                </div>
-                
-                <div>
-                    <button type="submit" id="verify-code-btn" aria-label="Подтвердить код">
-                        Войти
-                    </button>
-                    <button type="button" id="resend-code-btn" aria-label="Отправить код повторно">
-                        Отправить код повторно (<span id="countdown-timer" aria-live="polite">30</span> сек)
-                    </button>
-                </div>
-                
-                <button type="button" id="back-to-phone-btn" aria-label="Изменить номер телефона">
-                    Изменить номер
-                </button>
-            </form>
-        </section>
-    </main>
+      <form id="phone-form" method="post" novalidate>
+        <div>
+          <label for="phone">Номер телефона</label>
+          <input type="tel" id="phone" name="phone" required aria-required="true"
+            aria-describedby="phone-help phone-error" aria-invalid="false" autocomplete="tel"
+            placeholder="+7 123 456 78 90">
+          <div id="phone-help">Введите номер в формате +7XXXXXXXXXX или 8XXXXXXXXXX (10 цифр после кода)</div>
+          <div id="phone-error" class="error-message" role="alert" aria-live="polite"
+            style="color: red; margin-top: 5px;"></div>
+        </div>
 
-    <footer>
-        <p>© 2025 Все права защищены</p>
-    </footer>
+        <button type="submit" id="send-code-btn" aria-label="Отправить код подтверждения">
+          Получить код
+        </button>
+      </form>
+    </section>
 
-    <script>
-        (function() {
-            // DOM элементы
-            const stepPhone = document.getElementById('step-phone');
-            const stepCode = document.getElementById('step-code');
-            const phoneForm = document.getElementById('phone-form');
-            const phoneInput = document.getElementById('phone');
-            const codeForm = document.getElementById('code-form');
-            const codeInput = document.getElementById('code');
-            const resendCodeBtn = document.getElementById('resend-code-btn');
-            const backToPhoneBtn = document.getElementById('back-to-phone-btn');
-            const countdownSpan = document.getElementById('countdown-timer');
-            
-            // Хранилище текущего номера и последнего отправленного кода
-            let currentPhoneNumber = '';
-            let lastSentCode = '';
-            
-            // Таймер
-            let countdownInterval = null;
-            let remainingSeconds = 0;
-            let canResend = true;
-            
-            // Вспомогательная функция валидации номера
-            function validatePhone(phoneNumber) {
-                const digits = phoneNumber.replace(/\D/g, '');
-                return digits.length >= 10;
+    <!-- Шаг 2: ввод кода (изначально скрыт) -->
+    <section id="step-code" aria-labelledby="code-heading" hidden>
+      <h2 id="code-heading">Подтверждение кода</h2>
+
+      <form id="code-form" method="post" novalidate>
+        <div>
+          <label for="code">Код подтверждения</label>
+          <input type="text" id="code" name="code" required aria-required="true" aria-describedby="code-help code-error"
+            aria-invalid="false" autocomplete="off" inputmode="numeric" pattern="[0-9]{6}" placeholder="123456">
+          <div id="code-help">Введите 6-значный код из SMS</div>
+          <div id="code-error" class="error-message" role="alert" aria-live="polite"
+            style="color: red; margin-top: 5px;"></div>
+        </div>
+
+        <div>
+          <button type="submit" id="verify-code-btn" aria-label="Подтвердить код">
+            Войти
+          </button>
+          <button type="button" id="resend-code-btn" aria-label="Отправить код повторно">
+            Отправить код повторно (<span id="countdown-timer">30</span> сек)
+          </button>
+        </div>
+
+        <button type="button" id="back-to-phone-btn" aria-label="Изменить номер телефона">
+          Изменить номер
+        </button>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 Все права защищены</p>
+  </footer>
+
+  <div id="aria-announcer">Слова</div>
+
+  <script>
+    (function () {
+      // DOM элементы
+      const stepPhone = document.getElementById('step-phone');
+      const stepCode = document.getElementById('step-code');
+      const phoneForm = document.getElementById('phone-form');
+      const phoneInput = document.getElementById('phone');
+      const phoneError = document.getElementById('phone-error');
+      const codeForm = document.getElementById('code-form');
+      const codeInput = document.getElementById('code');
+      const codeError = document.getElementById('code-error');
+      const resendCodeBtn = document.getElementById('resend-code-btn');
+      const backToPhoneBtn = document.getElementById('back-to-phone-btn');
+      const countdownSpan = document.getElementById('countdown-timer');
+
+      // Хранилище текущего номера и последнего отправленного кода
+      let currentPhoneNumber = '';
+      let lastSentCode = '';
+
+      // Таймер
+      let countdownInterval = null;
+      let remainingSeconds = 0;
+      let canResend = true;
+
+      // Функция очистки ошибок
+      function clearPhoneError() {
+        phoneError.textContent = '';
+        phoneInput.setAttribute('aria-invalid', 'false');
+        phoneInput.removeAttribute('aria-errormessage');
+      }
+
+      function setPhoneError(message) {
+        phoneError.textContent = message;
+        phoneInput.setAttribute('aria-invalid', 'true');
+        phoneInput.setAttribute('aria-errormessage', 'phone-error');
+        phoneInput.focus();
+      }
+
+      function clearCodeError() {
+        codeError.textContent = '';
+        codeInput.setAttribute('aria-invalid', 'false');
+        codeInput.removeAttribute('aria-errormessage');
+      }
+
+      function setCodeError(message) {
+        codeError.textContent = message;
+        codeInput.setAttribute('aria-invalid', 'true');
+        codeInput.setAttribute('aria-errormessage', 'code-error');
+        codeInput.focus();
+      }
+
+      // Правильная валидация телефона: +7 или 8 в начале, затем 10 цифр
+      function validatePhone(phoneNumber) {
+        // Удаляем все пробелы, дефисы, скобки и другие разделители
+        const cleaned = phoneNumber.replace(/[\s\-\(\)]/g, '');
+
+        // Регулярное выражение для проверки:
+        // ^ - начало строки
+        // (\+7|8) - +7 или 8 в начале
+        // \d{10} - ровно 10 цифр
+        // $ - конец строки
+        const phoneRegex = /^(\+7|8)\d{10}$/;
+
+        if (!phoneRegex.test(cleaned)) {
+          return {valid: false, cleaned: ''};
+        }
+
+        // Нормализуем номер в формат +7XXXXXXXXXX для хранения
+        let normalized;
+        if (cleaned.startsWith('8')) {
+          normalized = '+7' + cleaned.substring(1);
+        } else {
+          normalized = cleaned;
+        }
+
+        return {valid: true, cleaned: normalized};
+      }
+
+      // Форматирование номера для отображения
+      function formatPhoneForDisplay(phoneNumber) {
+        // Ожидается номер в формате +7XXXXXXXXXX
+        if (phoneNumber && phoneNumber.startsWith('+7') && phoneNumber.length === 12) {
+          const digits = phoneNumber.substring(2);
+          return `+7 ${digits.substring(0, 3)} ${digits.substring(3, 6)} ${digits.substring(6, 8)} ${digits.substring(8, 10)}`;
+        }
+        return phoneNumber;
+      }
+
+      // Функция генерации случайного 6-значного кода
+      function generateCode() {
+        return Math.floor(100000 + Math.random() * 900000).toString();
+      }
+
+      // Функция отправки кода (мок) - ТОЛЬКО ЗДЕСЬ ALERT
+      function sendMockCode(phoneNumber) {
+        const code = generateCode();
+        lastSentCode = code;
+        currentPhoneNumber = phoneNumber;
+
+        const formattedPhone = formatPhoneForDisplay(phoneNumber);
+        // Мок-сообщение в alert (единственное место с alert)
+        alert(`код — ${code})`);
+
+        // Для отладки в консоль
+        console.log(`[MOCK] Код для ${phoneNumber}: ${code}`);
+      }
+
+      // Запуск таймера на 30 секунд
+      function startCountdown() {
+        if (countdownInterval) {
+          clearInterval(countdownInterval);
+        }
+
+        remainingSeconds = 30;
+        canResend = false;
+        updateCountdownDisplay();
+
+        countdownInterval = setInterval(function () {
+          if (remainingSeconds <= 1) {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+            canResend = true;
+            countdownSpan.textContent = '0';
+
+            // Анонсируем для скринридера
+            announceForScreenReader('Код можно отправить повторно. Кнопка отправки кода теперь активна.');
+          } else {
+            remainingSeconds--;
+            updateCountdownDisplay();
+          }
+        }, 1000);
+      }
+
+      function updateCountdownDisplay() {
+        countdownSpan.textContent = remainingSeconds;
+        if (!canResend) {
+          resendCodeBtn.setAttribute('aria-label', `Отправить код повторно. Доступно через ${remainingSeconds} секунд`);
+        } else {
+          resendCodeBtn.setAttribute('aria-label', 'Отправить код повторно');
+        }
+      }
+
+      function stopCountdown() {
+        if (countdownInterval) {
+          clearInterval(countdownInterval);
+          countdownInterval = null;
+        }
+        canResend = true;
+        remainingSeconds = 0;
+        updateCountdownDisplay();
+      }
+
+      function showCodeStep(phoneNumber) {
+        clearCodeError();
+        stepPhone.hidden = true;
+        stepCode.hidden = false;
+        codeInput.value = '';
+        codeInput.focus();
+
+        const formattedPhone = formatPhoneForDisplay(phoneNumber);
+        announceForScreenReader(`Код отправлен на номер ${formattedPhone}. Введите код подтверждения. Кнопка повторной отправки кода будет доступна через 30 секунд.`);
+      }
+
+      function showPhoneStep(resetCode = true) {
+        stopCountdown();
+        clearPhoneError();
+
+        stepPhone.hidden = false;
+        stepCode.hidden = true;
+
+        if (resetCode) {
+          currentPhoneNumber = '';
+          lastSentCode = '';
+          codeInput.value = '';
+          clearCodeError();
+        }
+
+        phoneInput.focus();
+      }
+
+      function announceForScreenReader(message) {
+        const announcer = document.getElementById('aria-announcer');
+        if (announcer) {
+          announcer.textContent = message;
+          setTimeout(() => {
+            if (announcer.textContent === message) {
+              announcer.textContent = '';
             }
-            
-            // Функция генерации случайного 6-значного кода
-            function generateCode() {
-                return Math.floor(100000 + Math.random() * 900000).toString();
-            }
-            
-            // Функция отправки кода (мок)
-            function sendMockCode(phoneNumber) {
-                const code = generateCode();
-                lastSentCode = code;
-                currentPhoneNumber = phoneNumber;
-                
-                // Мок-сообщение в alert
-                alert(`Мок-сообщение: На номер ${phoneNumber} отправлен код авторизации ${code}`);
-                
-                // Для отладки в консоль (чтобы тестировать неправильный ввод)
-                console.log(`[MOCK] Код для ${phoneNumber}: ${code}`);
-            }
-            
-            // Запуск таймера на 30 секунд
-            function startCountdown() {
-                // Сбрасываем существующий таймер
-                if (countdownInterval) {
-                    clearInterval(countdownInterval);
-                }
-                
-                remainingSeconds = 30;
-                canResend = false;
-                updateCountdownDisplay();
-                
-                countdownInterval = setInterval(function() {
-                    if (remainingSeconds <= 1) {
-                        // Таймер закончился
-                        clearInterval(countdownInterval);
-                        countdownInterval = null;
-                        canResend = true;
-                        countdownSpan.textContent = '0';
-                        
-                        // Анонсируем для скринридера
-                        announceForScreenReader('Код можно отправить повторно. Кнопка отправки кода теперь активна.');
-                    } else {
-                        remainingSeconds--;
-                        updateCountdownDisplay();
-                    }
-                }, 1000);
-            }
-            
-            function updateCountdownDisplay() {
-                countdownSpan.textContent = remainingSeconds;
-                // Обновляем aria-label для кнопки с актуальным таймером
-                if (!canResend) {
-                    resendCodeBtn.setAttribute('aria-label', `Отправить код повторно. Доступно через ${remainingSeconds} секунд`);
-                } else {
-                    resendCodeBtn.setAttribute('aria-label', 'Отправить код повторно');
-                }
-            }
-            
-            // Остановка таймера и сброс состояния
-            function stopCountdown() {
-                if (countdownInterval) {
-                    clearInterval(countdownInterval);
-                    countdownInterval = null;
-                }
-                canResend = true;
-                remainingSeconds = 0;
-                updateCountdownDisplay();
-            }
-            
-            // Переход к шагу ввода кода
-            function showCodeStep(phoneNumber) {
-                // Прячем шаг с телефоном, показываем шаг с кодом
-                stepPhone.hidden = true;
-                stepCode.hidden = false;
-                
-                // Фокусируемся на поле ввода кода для удобства
-                codeInput.focus();
-                
-                // Анонсируем для скринридера
-                announceForScreenReader(`Код отправлен на номер ${phoneNumber}. Введите код подтверждения. Кнопка повторной отправки кода будет доступна через 30 секунд.`);
-            }
-            
-            // Возврат к шагу ввода номера
-            function showPhoneStep(resetCode = true) {
-                // Останавливаем таймер
-                stopCountdown();
-                
-                // Показываем шаг с телефоном, скрываем шаг с кодом
-                stepPhone.hidden = false;
-                stepCode.hidden = true;
-                
-                if (resetCode) {
-                    // Очищаем сохранённые данные
-                    currentPhoneNumber = '';
-                    lastSentCode = '';
-                    codeInput.value = '';
-                }
-                
-                // Фокусируемся на поле телефона
-                phoneInput.focus();
-            }
-            
-            // Функция для анонса скринридеру
-            function announceForScreenReader(message) {
-                const announcer = document.getElementById('aria-announcer');
-                if (announcer) {
-                    announcer.textContent = message;
-                    setTimeout(() => {
-                        if (announcer.textContent === message) {
-                            announcer.textContent = '';
-                        }
-                    }, 5000);
-                }
-            }
-            
-            // Создаём скрытую область для анонсов скринридера
-            function createAnnouncer() {
-                const announcer = document.createElement('div');
-                announcer.id = 'aria-announcer';
-                announcer.setAttribute('aria-live', 'polite');
-                announcer.setAttribute('aria-atomic', 'true');
-                announcer.className = 'sr-only';
-                announcer.style.position = 'absolute';
-                announcer.style.width = '1px';
-                announcer.style.height = '1px';
-                announcer.style.padding = '0';
-                announcer.style.margin = '-1px';
-                announcer.style.overflow = 'hidden';
-                announcer.style.clip = 'rect(0, 0, 0, 0)';
-                announcer.style.border = '0';
-                document.body.appendChild(announcer);
-                return announcer;
-            }
-            
-            createAnnouncer();
-            
-            // ========== Обработчик отправки номера телефона ==========
-            phoneForm.addEventListener('submit', function(event) {
-                event.preventDefault();
-                
-                const phoneNumber = phoneInput.value.trim();
-                
-                // Валидация
-                if (!phoneNumber) {
-                    const msg = 'Пожалуйста, введите номер телефона.';
-                    alert(msg);
-                    announceForScreenReader(msg);
-                    phoneInput.focus();
-                    return;
-                }
-                
-                if (!validatePhone(phoneNumber)) {
-                    const msg = 'Введите корректный номер телефона (минимум 10 цифр).';
-                    alert(msg);
-                    announceForScreenReader(msg);
-                    phoneInput.focus();
-                    return;
-                }
-                
-                // Отправляем мок-код
-                sendMockCode(phoneNumber);
-                
-                // Запускаем таймер перед тем, как покажем шаг с кодом
-                startCountdown();
-                
-                // Переходим к шагу ввода кода
-                showCodeStep(phoneNumber);
-            });
-            
-            // ========== Обработчик подтверждения кода ==========
-            codeForm.addEventListener('submit', function(event) {
-                event.preventDefault();
-                
-                const enteredCode = codeInput.value.trim();
-                
-                if (!enteredCode) {
-                    const msg = 'Пожалуйста, введите код подтверждения.';
-                    alert(msg);
-                    announceForScreenReader(msg);
-                    codeInput.focus();
-                    return;
-                }
-                
-                // Проверяем код
-                if (enteredCode === lastSentCode) {
-                    // Код правильный — успешная авторизация
-                    const successMsg = `Добро пожаловать! Вы успешно авторизовались по номеру ${currentPhoneNumber}`;
-                    alert(successMsg);
-                    announceForScreenReader(successMsg);
-                    
-                    // Здесь мог бы быть редирект или сброс формы
-                    // Для демонстрации возвращаемся к началу
-                    showPhoneStep(true);
-                    phoneInput.value = '';
-                } else {
-                    // Неправильный код — возвращаем к вводу номера
-                    const errorMsg = `Неверный код. Возврат к вводу номера телефона.`;
-                    alert(errorMsg);
-                    announceForScreenReader(errorMsg);
-                    
-                    // Сбрасываем всё и показываем шаг с телефоном
-                    showPhoneStep(true);
-                    phoneInput.value = currentPhoneNumber; // Подставляем последний номер для удобства
-                    phoneInput.focus();
-                    
-                    // Дополнительное пояснение
-                    const retryMsg = `Попробуйте снова или введите другой номер.`;
-                    announceForScreenReader(retryMsg);
-                }
-            });
-            
-            // ========== Обработчик повторной отправки кода ==========
-            resendCodeBtn.addEventListener('click', function() {
-                if (!canResend) {
-                    const msg = `Повторная отправка будет доступна через ${remainingSeconds} секунд. Пожалуйста, подождите.`;
-                    alert(msg);
-                    announceForScreenReader(msg);
-                    // Возвращаем фокус на кнопку, чтобы пользователь мог попробовать позже
-                    resendCodeBtn.focus();
-                    return;
-                }
-                
-                if (!currentPhoneNumber) {
-                    // На всякий случай, если нет номера
-                    announceForScreenReader('Номер телефона не найден. Возврат к вводу номера.');
-                    showPhoneStep(true);
-                    return;
-                }
-                
-                // Отправляем новый код на тот же номер
-                sendMockCode(currentPhoneNumber);
-                
-                // Перезапускаем таймер
-                startCountdown();
-                
-                const msg = `Новый код отправлен на номер ${currentPhoneNumber}`;
-                alert(msg);
-                announceForScreenReader(msg);
-                
-                // Очищаем поле ввода кода
-                codeInput.value = '';
-                codeInput.focus();
-            });
-            
-            // ========== Обработчик кнопки "Изменить номер" ==========
-            backToPhoneBtn.addEventListener('click', function() {
-                showPhoneStep(true);
-                phoneInput.value = '';
-                phoneInput.focus();
-                
-                const msg = 'Вы можете изменить номер телефона';
-                announceForScreenReader(msg);
-            });
-            
-            // Дополнительно: обновляем aria-live для таймера при каждом изменении
-            // (уже есть aria-live="polite" на самом countdownSpan)
-            
-            // Очистка таймера при уходе со страницы
-            window.addEventListener('beforeunload', function() {
-                if (countdownInterval) {
-                    clearInterval(countdownInterval);
-                }
-            });
-        })();
-    </script>
+          }, 5000);
+        }
+      }
+
+      function createAnnouncer() {
+        announcer.setAttribute('aria-live', 'polite');
+        announcer.setAttribute('aria-atomic', 'true');
+        announcer.style.position = 'absolute';
+        announcer.style.width = '1px';
+        announcer.style.height = '1px';
+        announcer.style.padding = '0';
+        announcer.style.margin = '-1px';
+        announcer.style.overflow = 'hidden';
+        announcer.style.clip = 'rect(0, 0, 0, 0)';
+        announcer.style.border = '0';
+      }
+
+      createAnnouncer();
+
+      // ========== Обработчик отправки номера телефона ==========
+      phoneForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        clearPhoneError();
+
+        const phoneNumber = phoneInput.value.trim();
+
+        if (!phoneNumber) {
+          setPhoneError('Пожалуйста, введите номер телефона.');
+          return;
+        }
+
+        const validation = validatePhone(phoneNumber);
+
+        if (!validation.valid) {
+          setPhoneError('Неверный формат номера. Используйте +7XXXXXXXXXX');
+          return;
+        }
+
+        // Отправляем мок-код (alert внутри)
+        sendMockCode(validation.cleaned);
+
+        // Запускаем таймер
+        startCountdown();
+
+        // Переходим к шагу ввода кода
+        showCodeStep(validation.cleaned);
+      });
+
+      // Очистка ошибки при вводе номера
+      phoneInput.addEventListener('input', function () {
+        clearPhoneError();
+      });
+
+      // ========== Обработчик подтверждения кода ==========
+      codeForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        clearCodeError();
+
+        const enteredCode = codeInput.value.trim();
+
+        if (!enteredCode) {
+          setCodeError('Пожалуйста, введите код подтверждения.');
+          return;
+        }
+
+        if (!/^\d{6}$/.test(enteredCode)) {
+          setCodeError('Код должен состоять из 6 цифр.');
+          return;
+        }
+
+        if (enteredCode === lastSentCode) {
+          // Код правильный — успешная авторизация (alert для мока)
+          const formattedPhone = formatPhoneForDisplay(currentPhoneNumber);
+          alert(`Авторизация успешна!`);
+          // Возвращаем к началу для демонстрации
+          showPhoneStep(true);
+          phoneInput.value = '';
+        } else {
+          // Неправильный код — показываем ошибку на странице, не скрывая шаг с кодом
+          setCodeError(`Неверный код. Попробуйте ещё раз или нажмите "Отправить код повторно".`);
+          announceForScreenReader('Неверный код подтверждения. Пожалуйста, попробуйте снова.');
+          codeInput.value = '';
+          codeInput.focus();
+        }
+      });
+
+      // Очистка ошибки при вводе кода
+      codeInput.addEventListener('input', function () {
+        clearCodeError();
+      });
+
+      // ========== Обработчик повторной отправки кода ==========
+      resendCodeBtn.addEventListener('click', function () {
+        if (!canResend) {
+          const msg = `Повторная отправка будет доступна через ${remainingSeconds} секунд. Пожалуйста, подождите.`;
+          // Это информационное сообщение, показываем его в error-области на странице
+          setCodeError(msg);
+          announceForScreenReader(msg);
+          resendCodeBtn.focus();
+          return;
+        }
+
+        if (!currentPhoneNumber) {
+          announceForScreenReader('Номер телефона не найден. Возврат к вводу номера.');
+          showPhoneStep(true);
+          return;
+        }
+
+        // Отправляем новый код (alert внутри)
+        sendMockCode(currentPhoneNumber);
+
+        // Перезапускаем таймер
+        startCountdown();
+
+        // Очищаем ошибки и поле ввода кода
+        clearCodeError();
+        codeInput.value = '';
+
+        const formattedPhone = formatPhoneForDisplay(currentPhoneNumber);
+        announceForScreenReader(`Новый код отправлен на номер ${formattedPhone}`);
+        codeInput.focus();
+      });
+
+      // ========== Обработчик кнопки "Изменить номер" ==========
+      backToPhoneBtn.addEventListener('click', function () {
+        showPhoneStep(true);
+        phoneInput.value = '';
+        phoneInput.focus();
+      });
+
+      // Очистка таймера при уходе со страницы
+      window.addEventListener('beforeunload', function () {
+        if (countdownInterval) {
+          clearInterval(countdownInterval);
+        }
+      });
+    })();
+  </script>
 </body>
+
 </html>
