@@ -1,0 +1,82 @@
+@startuml
+' Use Case Diagram для агрегатора кредитов
+' Акторы: Заёмщик, Банк (внешняя система), Админ (опционально)
+
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Заёмщик\n(Borrower)" as User
+actor "Банковская\nсистема" as BankSystem <<external>>
+actor "Администратор\n(не обязателен)" as Admin
+
+rectangle "CreditMatch\nАгрегатор кредитов" {
+  
+  ' Блок авторизации
+  usecase "Авторизоваться\nпо номеру телефона" as UC_Auth
+  usecase "Ввести SMS-код" as UC_OTP
+  
+  ' Блок анкеты
+  usecase "Заполнить\nкредитную анкету" as UC_Form
+  usecase "Указать сумму\nи срок кредита" as UC_LoanParams
+  usecase "Указать доход\nи занятость" as UC_Income
+  
+  ' Блок подбора
+  usecase "Получить список\nбанков" as UC_List
+  usecase "Отсортировать\nпо ставке" as UC_Sort
+  usecase "Выбрать банк\nдля заявки" as UC_SelectBank
+  
+  ' Блок обработки
+  usecase "Отправить заявку\nв банк" as UC_SendToBank
+  usecase "Отобразить\nпроцесс проверки" as UC_Loading
+  usecase "Получить\nрешение банка" as UC_Decision
+  
+  ' Блок результата
+  usecase "Показать\nодобренную сумму" as UC_Success
+  usecase "Показать\nпричину отказа" as UC_Reject
+  usecase "Предложить\nальтернативный банк" as UC_Alternative
+  
+  ' Админ-функции
+  usecase "Управлять\nсписком банков" as UC_AdminBanks
+  usecase "Просматривать\nаналитику отказов" as UC_Analytics
+}
+
+' Связи пользователя
+User --> UC_Auth
+User --> UC_OTP
+User --> UC_Form
+User --> UC_LoanParams
+User --> UC_Income
+User --> UC_List
+User --> UC_Sort
+User --> UC_SelectBank
+User --> UC_Loading
+User --> UC_Success
+User --> UC_Reject
+User --> UC_Alternative
+
+' Связи с внешней системой банка
+BankSystem --> UC_SendToBank : "API-запрос\nна проверку"
+BankSystem --> UC_Decision : "Возвращает\nрешение"
+
+' Админ (опционально)
+Admin --> UC_AdminBanks
+Admin --> UC_Analytics
+
+' Отношения включения (include) и расширения (extend)
+
+' Анкета включает в себя ввод параметров
+UC_Form ..> UC_LoanParams : <<include>>
+UC_Form ..> UC_Income : <<include>>
+
+' Успех и отказ расширяют решение банка
+UC_Decision <|.. UC_Success : <<extend>>
+UC_Decision <|.. UC_Reject : <<extend>>
+
+' Альтернативный банк расширяет отказ
+UC_Reject <|.. UC_Alternative : <<extend>>
+
+' Отправка в банк расширяет выбор банка
+UC_SelectBank <|.. UC_SendToBank : <<extend>>
+
+title Use Case Diagram — Агрегатор кредитов CreditMatch
+@enduml
