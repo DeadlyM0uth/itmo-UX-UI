@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Кредитный навигатор — Результат заявки</title>
+    <title>Кредитный навигатор — Профиль</title>
     <style>
         * {
             margin: 0;
@@ -50,68 +50,7 @@
             padding: 2rem;
         }
 
-        /* Карточка статуса загрузки */
-        .loading-card {
-            background-color: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            padding: 1.5rem;
-            margin: 0 0 1.5rem 0;
-            border: 1px solid #e0e0e0;
-        }
-
-        .loading-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #e0e0e0;
-            border-top-color: #007aff;
-            border-radius: 50%;
-            animation: spin 0.6s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            font-size: 1rem;
-            color: #444;
-            margin: 0.75rem 0;
-            padding: 0.5rem;
-            background-color: #f8f8f8;
-            border-radius: 8px;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background-color: #e0e0e0;
-            border-radius: 3px;
-            margin-top: 1rem;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            width: 0%;
-            height: 100%;
-            background-color: #007aff;
-            border-radius: 3px;
-            transition: width 0.4s ease-out;
-        }
-
-        /* Карточка результата */
-        .result-card {
+        .profile-card {
             background-color: #fff;
             border-radius: 12px;
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
@@ -120,7 +59,7 @@
             border: 1px solid #e0e0e0;
         }
 
-        .result-card:focus-visible {
+        .profile-card:focus-visible {
             outline: 3px solid #007aff;
             outline-offset: 2px;
         }
@@ -132,58 +71,59 @@
             font-size: 0.75rem;
             font-weight: 600;
             margin-bottom: 1rem;
+            background-color: #fff8e1;
+            color: #8a6d1d;
         }
 
-        .status-approved {
-            background-color: #e6f7e6;
-            color: #2c7a2c;
-        }
-
-        .status-rejected {
-            background-color: #ffe6e6;
-            color: #d32f2f;
-        }
-
-        .result-title {
-            font-size: 1.5rem;
+        .section-title {
+            font-size: 1.125rem;
             font-weight: 700;
-            margin: 0.5rem 0;
-        }
-
-        .result-message {
-            font-size: 1rem;
-            color: #555;
-            margin-bottom: 1.25rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #eee;
-        }
-
-        .detail-row {
-            display: flex;
-            align-items: baseline;
-            flex-wrap: wrap;
-            gap: 0.5rem;
             margin: 0.75rem 0;
-            padding: 0.5rem;
-            background-color: #f9f9f9;
-            border-radius: 8px;
+            color: #333;
         }
 
-        .detail-label {
-            font-weight: 600;
-            min-width: 140px;
-            color: #444;
+        .applications-grid {
+            margin: 0.75rem 0 1.25rem;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.85rem;
         }
 
-        .detail-value {
-            color: #1a1a1a;
-            font-size: 1.05rem;
+        .application-card {
+            border: 1px solid #ececec;
+            border-radius: 10px;
+            padding: 0.95rem;
+            background-color: #fafafa;
         }
 
-        .amount-value {
-            font-size: 1.25rem;
+        .application-card-title {
             font-weight: 700;
-            color: #2c7a2c;
+            margin-bottom: 0.5rem;
+            color: #222;
+        }
+
+        .application-card-row {
+            margin: 0.25rem 0;
+            color: #333;
+            font-size: 0.94rem;
+        }
+
+        .application-card-status {
+            display: inline-block;
+            margin-top: 0.5rem;
+            padding: 0.2rem 0.55rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background-color: #fff8e1;
+            color: #8a6d1d;
+        }
+
+        .profile-hint {
+            color: #555;
+            font-size: 0.95rem;
+            border-top: 1px solid #eee;
+            padding-top: 1rem;
         }
 
         .button-group {
@@ -235,13 +175,6 @@
             background-color: #c7c7c7;
         }
 
-        .back-button {
-            background-color: #6c757d;
-        }
-
-        .back-button:hover:not(:disabled) {
-            background-color: #5a6268;
-        }
 
         footer {
             text-align: center;
@@ -280,11 +213,8 @@
             main {
                 padding: 1rem;
             }
-            .result-card {
+            .profile-card {
                 padding: 1.25rem;
-            }
-            .detail-label {
-                min-width: 120px;
             }
             .button-group {
                 flex-direction: column;
@@ -298,20 +228,14 @@
 <body>
     <header>
         <h1>Кредитный навигатор</h1>
-        <div class="subheader">Результат рассмотрения вашей заявки</div>
+        <div class="subheader">Профиль: ваши заявки и текущий статус</div>
     </header>
 
     <main>
-        <!-- Контейнер для статуса загрузки -->
-        <div id="loading-container" role="region" aria-label="Статус проверки заявки"></div>
-        
-        <!-- Контейнер для результата -->
-        <div id="result-container" role="region" aria-label="Результат кредитной заявки"></div>
-        
-        <!-- Кнопки управления -->
+        <div id="profile-container" role="region" aria-label="Профиль клиента и заявки"></div>
+
         <div class="button-group">
-            <button id="refresh-btn" aria-label="Получить новый результат рассмотрения заявки">🔄 Новый результат</button>
-            <button id="back-to-banks-btn" class="secondary-button" aria-label="Вернуться к списку банков">← К списку банков</button>
+            <button id="back-to-banks-btn" class="secondary-button" aria-label="Перейти к списку банков">← К списку банков</button>
         </div>
     </main>
 
@@ -323,288 +247,188 @@
 
     <script>
         (function() {
-            // DOM элементы
-            const loadingContainer = document.getElementById('loading-container');
-            const resultContainer = document.getElementById('result-container');
-            const refreshBtn = document.getElementById('refresh-btn');
+            const profileContainer = document.getElementById('profile-container');
             const backToBanksBtn = document.getElementById('back-to-banks-btn');
             const announcer = document.getElementById('aria-announcer');
 
-            // Функция для объявления через ARIA
             function announce(message) {
                 if (announcer) {
                     announcer.textContent = message;
                     setTimeout(() => {
                         if (announcer) announcer.textContent = '';
-                    }, 5000);
+                    }, 4000);
                 }
             }
 
-            // Генерация случайного результата (одобрено / отказано)
-            function getRandomResult() {
-                const isApproved = Math.random() >= 0.5;
-                
-                if (isApproved) {
-                    const amount = Math.floor(Math.random() * (5000000 - 50000 + 1) + 50000);
-                    const rate = (Math.random() * (28 - 8) + 8).toFixed(1);
-                    const banks = ['Сбербанк', 'Тинькофф', 'Альфа-Банк', 'ВТБ', 'Райффайзенбанк', 'Газпромбанк', 'Открытие'];
-                    const bank = banks[Math.floor(Math.random() * banks.length)];
-                    
-                    return {
-                        status: 'approved',
-                        title: 'Одобрено! 🎉',
-                        message: 'Поздравляем! Ваша кредитная заявка одобрена.',
-                        amount: amount,
-                        rate: rate,
-                        bank: bank,
-                        advice: 'Деньги поступят на карту в течение 5 минут. С вами свяжется менеджер банка.'
-                    };
-                } else {
-                    const reasons = [
-                        'Недостаточный уровень дохода для запрашиваемой суммы',
-                        'Высокая кредитная нагрузка (более 50% от дохода)',
-                        'Небольшая кредитная история (менее 6 месяцев)',
-                        'Просрочки по предыдущим кредитам',
-                        'Не подтверждён источник дохода документально'
-                    ];
-                    const reason = reasons[Math.floor(Math.random() * reasons.length)];
-                    
-                    const suggestions = [
-                        'попробовать меньшую сумму кредита',
-                        'выбрать другой банк с более лояльными условиями',
-                        'привлечь поручителя или созаёмщика',
-                        'погасить текущие кредиты и повторить попытку'
-                    ];
-                    const suggestion = suggestions[Math.floor(Math.random() * suggestions.length)];
-                    
-                    return {
-                        status: 'rejected',
-                        title: 'К сожалению, отказано',
-                        message: 'Банк не может одобрить заявку на текущих условиях.',
-                        reason: reason,
-                        suggestion: suggestion
-                    };
-                }
-            }
-
-            // Отображение процесса загрузки с пошаговыми статусами
-            async function showLoadingStatus() {
-                loadingContainer.innerHTML = '';
-                resultContainer.innerHTML = '';
-                
-                const steps = [
-                    { text: 'Проверяем персональные данные...', delay: 10000 },
-                    { text: 'Анализируем кредитную историю...', delay: 12000 },
-                    { text: 'Запрашиваем решение банка-партнёра...', delay: 13000 },
-                    { text: 'Формируем финальное предложение...', delay: 10000 }
+            function getMockHistory() {
+                return [
+                    {
+                        title: 'Заявка #2411',
+                        bank: 'Альфа-Банк',
+                        amount: '350 000 ₽',
+                        status: 'Одобрена'
+                    },
+                    {
+                        title: 'Заявка #2398',
+                        bank: 'ВТБ',
+                        amount: '500 000 ₽',
+                        status: 'Отказ'
+                    }
                 ];
+            }
                 
-                const loadingCard = document.createElement('div');
-                loadingCard.className = 'loading-card';
-                loadingCard.setAttribute('aria-live', 'polite');
-                loadingCard.setAttribute('aria-busy', 'true');
-                
-                const titleDiv = document.createElement('div');
-                titleDiv.className = 'loading-title';
-                titleDiv.innerHTML = '<span class="loading-spinner" aria-hidden="true"></span> Обработка заявки';
-                loadingCard.appendChild(titleDiv);
-                
-                const statusText = document.createElement('div');
-                statusText.className = 'loading-text';
-                statusText.setAttribute('aria-label', 'Текущий этап проверки');
-                loadingCard.appendChild(statusText);
-                
-                const progressBar = document.createElement('div');
-                progressBar.className = 'progress-bar';
-                const progressFill = document.createElement('div');
-                progressFill.className = 'progress-fill';
-                progressBar.appendChild(progressFill);
-                loadingCard.appendChild(progressBar);
-                
-                loadingContainer.appendChild(loadingCard);
-                
-                let currentStep = 0;
-                for (const step of steps) {
-                    currentStep++;
-                    statusText.textContent = step.text;
-                    announce(step.text);
-                    
-                    const percent = (currentStep / steps.length) * 100;
-                    progressFill.style.width = `${percent}%`;
-                    
-                    await new Promise(resolve => setTimeout(resolve, step.delay));
+            function createApplicationCard(application, isNew = false) {
+                const appCard = document.createElement('article');
+                appCard.className = 'application-card';
+
+                const title = document.createElement('div');
+                title.className = 'application-card-title';
+                title.textContent = application.title;
+                appCard.appendChild(title);
+
+                const bankRow = document.createElement('div');
+                bankRow.className = 'application-card-row';
+                bankRow.textContent = `Банк: ${application.bank}`;
+                appCard.appendChild(bankRow);
+
+                const amountRow = document.createElement('div');
+                amountRow.className = 'application-card-row';
+                amountRow.textContent = `Сумма: ${application.amount}`;
+                appCard.appendChild(amountRow);
+
+                if (application.rate) {
+                    const rateRow = document.createElement('div');
+                    rateRow.className = 'application-card-row';
+                    rateRow.textContent = `Ставка: ${application.rate}`;
+                    appCard.appendChild(rateRow);
                 }
-                
-                // Небольшая пауза для фиксации 100%
-                await new Promise(resolve => setTimeout(resolve, 300));
-                return true;
+
+                if (application.term) {
+                    const termRow = document.createElement('div');
+                    termRow.className = 'application-card-row';
+                    termRow.textContent = `Срок: ${application.term}`;
+                    appCard.appendChild(termRow);
+                }
+
+                const status = document.createElement('span');
+                status.className = 'application-card-status';
+                status.textContent = application.status;
+                appCard.appendChild(status);
+
+                if (isNew) {
+                    const progress = [
+                        '⏳ Проверяем персональные данные...',
+                        '🔎 Анализируем кредитную историю...',
+                        '🏦 Запрашиваем решение банка...'
+                    ];
+
+                    let idx = 0;
+                    status.textContent = progress[idx];
+                    announce(progress[idx]);
+
+                    const interval = setInterval(() => {
+                        idx += 1;
+
+                        if (idx < progress.length) {
+                            status.textContent = progress[idx];
+                            announce(progress[idx]);
+                            return;
+                        }
+
+                        clearInterval(interval);
+
+                        const isApproved = Math.random() >= 0.5;
+                        const finalStatus = isApproved ? '✅ Одобрена' : '❌ Отказана';
+
+                        status.textContent = finalStatus;
+                        if (isApproved) {
+                            status.style.backgroundColor = '#e6f7e6';
+                            status.style.color = '#2c7a2c';
+                            sessionStorage.setItem('latestApplicationStatus', 'Одобрена');
+                            announce('Результат по новой заявке: одобрена');
+                        } else {
+                            status.style.backgroundColor = '#ffe6e6';
+                            status.style.color = '#d32f2f';
+                            sessionStorage.setItem('latestApplicationStatus', 'Отказана');
+                            announce('Результат по новой заявке: отказана');
+                        }
+                    }, 6700);
+                }
+
+                return appCard;
             }
 
-            // Отображение финального результата
-            function displayFinalResult() {
-                const result = getRandomResult();
-                resultContainer.innerHTML = '';
-                
-                const resultCard = document.createElement('div');
-                resultCard.className = 'result-card';
-                resultCard.tabIndex = -1;
-                
-                // Бейдж статуса
+            function buildProfile() {
+                const fullName = sessionStorage.getItem('latestApplicationName') || 'Пользователь';
+                const amount = sessionStorage.getItem('latestApplicationAmount') || '—';
+                const term = sessionStorage.getItem('latestApplicationTerm') || '—';
+                const bank = sessionStorage.getItem('latestApplicationBank') || '—';
+                const rate = sessionStorage.getItem('latestApplicationRate') || '—';
+                const status = sessionStorage.getItem('latestApplicationStatus') || 'На рассмотрении';
+
+                profileContainer.innerHTML = '';
+
+                const card = document.createElement('section');
+                card.className = 'profile-card';
+                card.tabIndex = -1;
+
                 const statusBadge = document.createElement('span');
-                statusBadge.className = `status-badge ${result.status === 'approved' ? 'status-approved' : 'status-rejected'}`;
-                statusBadge.textContent = result.status === 'approved' ? '✓ Одобрено' : '✗ Отказано';
-                resultCard.appendChild(statusBadge);
-                
-                // Заголовок
-                const title = document.createElement('h2');
-                title.className = 'result-title';
-                title.textContent = result.title;
-                resultCard.appendChild(title);
-                
-                // Сообщение
-                const message = document.createElement('div');
-                message.className = 'result-message';
-                message.textContent = result.message;
-                resultCard.appendChild(message);
-                
-                if (result.status === 'approved') {
-                    // Сумма кредита
-                    const amountRow = document.createElement('div');
-                    amountRow.className = 'detail-row';
-                    amountRow.innerHTML = `
-                        <span class="detail-label">💰 Сумма кредита:</span>
-                        <span class="detail-value amount-value">${result.amount.toLocaleString()} ₽</span>
-                    `;
-                    resultCard.appendChild(amountRow);
-                    
-                    // Процентная ставка
-                    const rateRow = document.createElement('div');
-                    rateRow.className = 'detail-row';
-                    rateRow.innerHTML = `
-                        <span class="detail-label">📊 Процентная ставка:</span>
-                        <span class="detail-value">${result.rate}% годовых</span>
-                    `;
-                    resultCard.appendChild(rateRow);
-                    
-                    // Банк
-                    const bankRow = document.createElement('div');
-                    bankRow.className = 'detail-row';
-                    bankRow.innerHTML = `
-                        <span class="detail-label">🏦 Банк-партнёр:</span>
-                        <span class="detail-value">${result.bank}</span>
-                    `;
-                    resultCard.appendChild(bankRow);
-                    
-                    // Совет
-                    const adviceRow = document.createElement('div');
-                    adviceRow.className = 'detail-row';
-                    adviceRow.innerHTML = `
-                        <span class="detail-label">💡 Что дальше:</span>
-                        <span class="detail-value">${result.advice}</span>
-                    `;
-                    resultCard.appendChild(adviceRow);
-                    
-                    // Скрытый текст для скринридеров
-                    const srText = document.createElement('span');
-                    srText.className = 'visually-hidden';
-                    srText.textContent = `Ваша заявка одобрена на сумму ${result.amount.toLocaleString()} рублей, под ${result.rate} процентов годовых, банк ${result.bank}. ${result.advice}`;
-                    resultCard.appendChild(srText);
-                    
-                    announce(`Заявка одобрена! Сумма ${result.amount.toLocaleString()} рублей, ставка ${result.rate}%, банк ${result.bank}`);
-                    
-                } else {
-                    // Причина отказа
-                    const reasonRow = document.createElement('div');
-                    reasonRow.className = 'detail-row';
-                    reasonRow.innerHTML = `
-                        <span class="detail-label">📋 Причина отказа:</span>
-                        <span class="detail-value">${result.reason}</span>
-                    `;
-                    resultCard.appendChild(reasonRow);
-                    
-                    // Рекомендация
-                    const suggestionRow = document.createElement('div');
-                    suggestionRow.className = 'detail-row';
-                    suggestionRow.innerHTML = `
-                        <span class="detail-label">💡 Рекомендация:</span>
-                        <span class="detail-value">${result.suggestion}</span>
-                    `;
-                    resultCard.appendChild(suggestionRow);
-                    
-                    // Кнопка перехода к списку банков
-                    const retryButton = document.createElement('button');
-                    retryButton.textContent = 'Выбрать другой банк';
-                    retryButton.className = 'secondary-button';
-                    retryButton.style.marginTop = '1rem';
-                    retryButton.style.width = 'auto';
-                    retryButton.setAttribute('aria-label', 'Вернуться к списку банков и выбрать другое предложение');
-                    retryButton.addEventListener('click', () => {
-                        window.location.href = 'banks.html';
-                    });
-                    
-                    const buttonWrapper = document.createElement('div');
-                    buttonWrapper.style.marginTop = '0.75rem';
-                    buttonWrapper.appendChild(retryButton);
-                    resultCard.appendChild(buttonWrapper);
-                    
-                    // Скрытый текст для скринридеров
-                    const srText = document.createElement('span');
-                    srText.className = 'visually-hidden';
-                    srText.textContent = `Заявка отклонена. Причина: ${result.reason}. Рекомендация: ${result.suggestion}.`;
-                    resultCard.appendChild(srText);
-                    
-                    announce(`Заявка отклонена. ${result.reason}. Рекомендуем ${result.suggestion}`);
-                }
-                
-                resultContainer.appendChild(resultCard);
-                
-                // Фокусируемся на карточке результата для удобства навигации
-                resultCard.focus();
+                statusBadge.className = 'status-badge';
+                statusBadge.textContent = `👤 ${fullName}`;
+                card.appendChild(statusBadge);
+
+                const newTitle = document.createElement('h2');
+                newTitle.className = 'section-title';
+                newTitle.textContent = 'Новая заявка';
+                card.appendChild(newTitle);
+
+                const newGrid = document.createElement('div');
+                newGrid.className = 'applications-grid';
+                const amountText = String(amount).includes('₽') ? String(amount) : `${amount} ₽`;
+                newGrid.appendChild(createApplicationCard({
+                    title: 'Заявка #6767',
+                    bank,
+                    amount: amountText,
+                    term,
+                    rate,
+                    status
+                }, true));
+                card.appendChild(newGrid);
+
+                const historyTitle = document.createElement('h3');
+                historyTitle.className = 'section-title';
+                historyTitle.textContent = 'Предыдущие заявки (мок):';
+                card.appendChild(historyTitle);
+
+                const historyGrid = document.createElement('div');
+                historyGrid.className = 'applications-grid';
+                const history = getMockHistory();
+                history.forEach(item => {
+                    historyGrid.appendChild(createApplicationCard(item));
+                });
+                card.appendChild(historyGrid);
+
+                const hint = document.createElement('p');
+                hint.className = 'profile-hint';
+                hint.textContent = 'Мы проверяем вашу новую заявку. Обычно ответ приходит в течение 5 минут.';
+                card.appendChild(hint);
+
+                const srText = document.createElement('span');
+                srText.className = 'visually-hidden';
+                srText.textContent = `Профиль открыт. Новая заявка в банке ${bank}, сумма ${amount} рублей, статус обновляется автоматически.`;
+                card.appendChild(srText);
+
+                profileContainer.appendChild(card);
+                card.focus();
+                announce('Открыт профиль с карточками заявок и обновлением статуса');
             }
-            
-            // Основная функция: показать загрузку → результат
-            async function displayResultWithDelay() {
-                // Блокируем кнопку обновления на время анимации
-                refreshBtn.disabled = true;
-                
-                // Очищаем контейнеры
-                loadingContainer.innerHTML = '';
-                resultContainer.innerHTML = '';
-                
-                // Показываем процесс загрузки
-                await showLoadingStatus();
-                
-                // Показываем финальный результат
-                displayFinalResult();
-                
-                // Разблокируем кнопку
-                refreshBtn.disabled = false;
-            }
-            
-            // Обработчик кнопки "Новый результат"
-            refreshBtn.addEventListener('click', () => {
-                if (refreshBtn.disabled) return;
-                displayResultWithDelay();
-            });
-            
-            // Обработчик кнопки "К списку банков"
+
             backToBanksBtn.addEventListener('click', () => {
                 announce('Переход к списку банков');
-                window.location.href = 'banks.html';
+                window.location.href = 'banklist.html';
             });
             
-            // Запускаем получение результата при загрузке страницы
-            displayResultWithDelay();
-            
-            // Обработка Escape для снятия фокуса
-            window.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    const focused = document.activeElement;
-                    if (focused && focused.classList && focused.classList.contains('result-card')) {
-                        focused.blur();
-                    }
-                }
-            });
+            buildProfile();
         })();
     </script>
 </body>

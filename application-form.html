@@ -147,6 +147,34 @@
       font-weight: normal;
     }
 
+    .top-actions {
+      display: flex;
+      justify-content: flex-start;
+      margin-bottom: 1rem;
+    }
+
+    .link-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+      background-color: #e0e0e0;
+      color: #333;
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .link-button:hover {
+      background-color: #c7c7c7;
+    }
+
+    .link-button:focus-visible {
+      outline: 3px solid #007aff;
+      outline-offset: 2px;
+    }
+
     .form-actions {
       display: flex;
       gap: 1rem;
@@ -234,6 +262,9 @@
 
   <main>
     <section class="credit-form-container">
+      <div class="top-actions">
+        <a href="banklist.html" class="link-button" aria-label="Вернуться к списку банков">← К банкам</a>
+      </div>
       <h2>Заполните заявку</h2>
       <form id="credit-form" novalidate>
         <!-- Личная информация -->
@@ -646,14 +677,18 @@
             comment: document.getElementById('comment').value.trim()
           };
           
-          // Мок отправки - показываем alert с подтверждением
-          alert(`✅ Заявка на кредит успешно отправлена!\n\n${formData.fullname}, сумма ${Number(formData.creditAmount).toLocaleString()} ₽.\nСрок рассмотрения до 5 минут.`);
-          announce('Заявка отправлена. Спасибо за обращение!');
-          
-          // По желанию можно сбросить форму после успешной отправки?
-          // Но согласно доступности, не сбрасываем, но можно предложить очистку вручную. Оставим.
-          // Для демонстрации можно очистить, но это не требуется по заданию, однако многие хотят. 
-          // Лучше не очищать, чтобы пользователь видел данные, но добавим кнопку Очистить.
+          const selectedBankName = sessionStorage.getItem('selectedBankName') || 'Не выбран';
+          const selectedBankRate = sessionStorage.getItem('selectedBankRate') || 'не указана';
+
+          sessionStorage.setItem('latestApplicationName', formData.fullname);
+          sessionStorage.setItem('latestApplicationAmount', Number(formData.creditAmount).toLocaleString());
+          sessionStorage.setItem('latestApplicationTerm', formData.creditTerm || 'Не указан');
+          sessionStorage.setItem('latestApplicationBank', selectedBankName);
+          sessionStorage.setItem('latestApplicationRate', selectedBankRate);
+          sessionStorage.setItem('latestApplicationStatus', 'На рассмотрении');
+
+          announce('Заявка отправлена. Переходим в профиль.');
+          window.location.href = 'result.html';
         } else {
           announce('Пожалуйста, исправьте ошибки в форме');
           // Фокусируемся на первом поле с ошибкой

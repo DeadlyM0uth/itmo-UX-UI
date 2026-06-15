@@ -42,6 +42,34 @@
             margin-top: 0.5rem;
         }
 
+        .top-actions {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .link-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            background-color: #e0e0e0;
+            color: #333;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .link-button:hover {
+            background-color: #c7c7c7;
+        }
+
+        .link-button:focus-visible {
+            outline: 3px solid #007aff;
+            outline-offset: 2px;
+        }
+
         main {
             flex: 1;
             max-width: 900px;
@@ -240,6 +268,9 @@
     <header>
         <h1>Кредитный навигатор</h1>
         <div class="subheader">Сравните предложения банков и выберите лучшее</div>
+        <div class="top-actions">
+            <a href="result.html" class="link-button" aria-label="Перейти в профиль">👤 Профиль</a>
+        </div>
     </header>
 
     <main>
@@ -390,9 +421,14 @@
                 
                 selectButton.addEventListener('click', (e) => {
                     e.stopPropagation();
+                    const selectedBank = bank.name || 'Без названия';
                     const rateMsg = rateValue !== null ? `${rateValue}%` : 'не указана';
-                    alert(`✅ Вы выбрали банк "${bank.name || 'Без названия'}" со ставкой ${rateMsg}`);
-                    announce(`Выбран банк ${bank.name || 'без названия'}, ставка ${rateMsg}`);
+
+                    sessionStorage.setItem('selectedBankName', selectedBank);
+                    sessionStorage.setItem('selectedBankRate', rateMsg);
+
+                    announce(`Выбран банк ${selectedBank}, ставка ${rateMsg}. Переходим к анкете.`);
+                    window.location.href = 'application-form.html';
                 });
 
                 // Сборка карточки
