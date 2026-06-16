@@ -1,0 +1,27 @@
+@startuml
+
+node "Login Screen\n(Авторизация)" as LOGIN
+node "OTP Input\n(Ввод кода)" as OTP
+node "Application Form\n(Анкета)" as FORM
+node "Banks List\n(Список банков)" as BANKS
+node "Loading Screen\n(Экран ожидания)" as LOADING
+node "Success Screen\n(Одобрение)" as SUCCESS
+node "Reject Screen\n(Отказ)" as REJECT
+
+' Переходы
+OTP --> LOGIN : "Неккоректный код"
+LOGIN --> OTP : "Ввод номера\nи нажатие\n'Получить код'"
+OTP --> FORM : "Корректный\nкод"
+FORM --> BANKS : "Нажатие\n'Подобрать\nбанки'"
+BANKS --> LOADING : "Выбор банка\n'Оформить'"
+LOADING --> SUCCESS : "Статус:\n'Одобрено'"
+LOADING --> REJECT : "Статус:\n'Отказано'"
+REJECT --> BANKS : "Кнопка\n'Подобрать\nдругой банк'"
+
+' Обратные переходы (сброс/отмена)
+FORM --> LOGIN : "Выход /\nСброс сессии"
+BANKS --> FORM : "Изменить\nпараметры\nанкеты"
+
+' Выделение стартовой точки
+title Граф интерфейса CreditMatch (навигация между экранами)
+@enduml
