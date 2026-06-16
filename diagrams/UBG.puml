@@ -1,46 +1,52 @@
 @startuml
-' Простая диаграмма поведения пользователя (без вложенности)
+' Диаграмма поведения пользователя по текущей реализации
 
 skinparam nodesep 60
 skinparam ranksep 80
 
-[*] --> LoginScreen : Пользователь открыл приложение
+[*] --> LoginScreen : Пользователь открыл index.html
 
-LoginScreen --> NumberValidating : Ввод номера телефона
-NumberValidating --> LoginScreen : Неверный формат номера (ошибка)
-NumberValidating --> OTPInput : Верный формат номера
+LoginScreen --> PhoneValidating : Ввод номера телефона
+PhoneValidating --> LoginScreen : Неверный формат номера
+PhoneValidating --> CodeScreen : Верный номер, отправка mock-кода
 
-OTPInput --> AwaitCode
+CodeScreen --> CodeValidating : Ввод 6-значного кода
+CodeValidating --> CodeScreen : Неверный код
+CodeValidating --> BanksScreen : Верный код
 
-AwaitCode --> CodeValidating : Ввод 4 цифр
-CodeValidating --> LoginScreen : Неверный код (ошибка)
-CodeValidating --> FormScreen : Верный код
+CodeScreen --> ResendTimer : Ожидание 60 сек
+ResendTimer --> CodeScreen : Повторная отправка кода
+CodeScreen --> LoginScreen : Изменить номер
 
-AwaitCode --> ResendTimer : Таймер 60 сек
-ResendTimer --> AwaitCode : Повторная отправка
+BanksScreen --> BanksLoading : Загрузка banks.json
+BanksLoading --> BanksScreen : Список предложений
+BanksLoading --> BanksError : Ошибка загрузки
+BanksError --> BanksLoading : Повторить попытку
+BanksLoading --> BanksEmpty : Нет предложений
 
-FormScreen --> EmptyForm
+BanksScreen --> BankSelecting : Выбор предложения
+BankSelecting --> ApplicationForm : Переход к application-form.html
 
-EmptyForm --> PartialForm : Заполнение одного поля
-PartialForm --> FullForm : Все поля заполнены
-FullForm --> BanksScreen : Кнопка "Подобрать банки"
+BanksScreen --> ProfileScreen : Кнопка "Профиль"
+BanksScreen --> LoginScreen : Кнопка "Выход"
 
-BanksScreen --> BankSelecting : Выбор банка
-BankSelecting --> LoadingScreen : Банк выбран
+ApplicationForm --> FormValidating : Отправить заявку
+FormValidating --> ApplicationForm : Есть ошибки валидации
+FormValidating --> ProfileScreen : Форма валидна
+ApplicationForm --> BanksScreen : Кнопка "К банкам"
 
-LoadingScreen --> Step1_DataCheck
+ProfileScreen --> Step1_DataCheck : Новая заявка создана
+Step1_DataCheck --> Step2_CreditHistory : Статус 1 завершён
+Step2_CreditHistory --> Step3_BankDecision : Статус 2 завершён
+Step3_BankDecision --> Approved : Решение: одобрено
+Step3_BankDecision --> Rejected : Решение: отказано
 
-Step1_DataCheck --> Step2_CreditBureau : Статус 1 завершён
-Step2_CreditBureau --> Step3_FinalOffer : Статус 2 завершён
-Step3_FinalOffer --> ResultScreen : Статус 3 завершён
+Approved --> BanksScreen : Вернуться к списку банков
+Rejected --> BanksScreen : Вернуться к списку банков
 
-ResultScreen --> Rejected
-ResultScreen --> Approved
+LoginScreen --> [*] : Закрытие приложения
+BanksScreen --> [*] : Закрытие приложения
+ProfileScreen --> [*] : Закрытие приложения
 
-Rejected --> BanksScreen : "Подобрать другой банк"
-Rejected --> [*] : Закрытие приложения
-
-Approved --> [*] : Закрытие приложения
-
-title Диаграмма поведения пользователя CreditMatch (простая версия)
+title Диаграмма поведения пользователя «Кредитный навигатор» (текущая версия)
 @enduml

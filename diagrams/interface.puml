@@ -1,0 +1,57 @@
+@startuml
+' State Machine Diagram — навигация между состояниями интерфейса
+
+[*] --> IndexPage : Открытие приложения
+
+state IndexPage {
+  [*] --> PhoneStep
+  PhoneStep --> CodeStep : Номер валиден, код отправлен
+  CodeStep --> PhoneStep : Кнопка «Изменить номер»
+  PhoneStep --> PhoneStep : Ошибка формата номера
+  CodeStep --> CodeStep : Неверный код
+  CodeStep --> CodeStep : Повторная отправка (таймер 60 сек)
+}
+
+IndexPage --> BankListPage : Код верный (переход на banklist.html)
+
+state BankListPage {
+  [*] --> BanksLoading : Загрузка banks.json
+  BanksLoading --> BanksDisplay : Успешная загрузка
+  BanksLoading --> BanksError : Ошибка загрузки
+  BanksError --> BanksLoading : Повторить попытку
+  BanksLoading --> BanksEmpty : Нет предложений
+  
+  BanksDisplay --> BankSelected : Выбор предложения
+}
+
+BankListPage --> ApplicationFormPage : Банк выбран (переход на application-form.html)
+BankListPage --> ResultPage : Кнопка «Профиль» (переход на result.html)
+BankListPage --> [*] : Кнопка «Выход» (переход на index.html)
+
+state ApplicationFormPage {
+  [*] --> FormEditing
+  FormEditing --> FormValidating : Отправка формы
+  FormValidating --> FormEditing : Есть ошибки валидации
+  FormValidating --> FormSubmitted : Форма валидна
+}
+
+ApplicationFormPage --> BankListPage : Кнопка «К банкам»
+ApplicationFormPage --> ResultPage : Форма отправлена (переход на result.html)
+
+state ResultPage {
+  [*] --> ProfileLoading : Загрузка данных из sessionStorage
+  ProfileLoading --> Step1_DataCheck : Этап 1: Проверка персональных данных
+  Step1_DataCheck --> Step2_CreditHistory : Этап 2: Анализ кредитной истории
+  Step2_CreditHistory --> Step3_BankDecision : Этап 3: Запрос решения банка
+  Step3_BankDecision --> Approved : Решение: одобрено
+  Step3_BankDecision --> Rejected : Решение: отказано
+}
+
+ResultPage --> BankListPage : Кнопка «К списку банков»
+ResultPage --> [*] : Закрытие приложения
+
+Approved --> [*]
+Rejected --> [*]
+
+title State Machine Diagram — «Кредитный навигатор»
+@enduml
